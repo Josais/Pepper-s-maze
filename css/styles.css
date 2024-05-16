@@ -19,11 +19,11 @@ div#main_container {
 
 }
 
-div#controller_container {
-
-}
-
 div#maze_container {
+
+    overflow-wrap: break-word; 
+    line-height: 14px; 
+    letter-spacing: -2px;
 
     width: 500px;
     height: 500px;

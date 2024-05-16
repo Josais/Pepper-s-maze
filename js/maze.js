@@ -1,34 +1,33 @@
-var mazeWidth = 40;
-var mazeHeight = mazeWidth;
+const mazeWidth = 40;
+const mazeHeight = mazeWidth;
 
 window.addEventListener("load", init);
 
 function init() {
     baseMaze();
-    paint();
+    addCells();
 }
 
-function paint() {
-	var startAtRow = 1;
-	var startAtCol = 1;
+function addCells() {
+	var rowIndex = 1;
+	var colIndex = 1;
+
 	var currentCell;
 	
-    addRoute(startAtRow, startAtCol, false);
+    addRoute(rowIndex, colIndex, false);
 
     for (n = 1; n < (mazeWidth * mazeHeight) - 1; n++) {
-        var currentCell = document.getElementById("cell_" + startAtRow + "_" + startAtCol);
+        currentCell = document.getElementById("cell_" + rowIndex + "_" + colIndex);
         if (currentCell.getAttribute("occupied") == "true") {
-            addRoute(startAtRow, startAtCol, true);
+            addRoute(rowIndex, colIndex, true);
         }
-        if (startAtCol == mazeWidth) {
-            startAtRow++;
-            startAtCol = 1;
+        if (colIndex == mazeWidth) {
+            rowIndex++;
+            colIndex = 1;
         } else {
-            startAtCol++;
+            colIndex++;
         }
-
     }
-
 }
 
 function addRoute(startAtRow, startAtCol, createDetour, backgroundColorRoute = "rgb(240, 0, 0)") {
@@ -123,6 +122,7 @@ function addRoute(startAtRow, startAtCol, createDetour, backgroundColorRoute = "
 
         lastCells.push([rowIndex, colIndex]);
         currentCell = document.getElementById("cell_" + rowIndex + "_" + colIndex);
+
         switch(exit) {
             case "right":
                 currentCell.style["border-left"] = "none";
