@@ -1,11 +1,108 @@
-const mazeWidth = 40;
+const mazeWidth = 20;
 const mazeHeight = mazeWidth;
 
+let humanCell;
+
+const colors = {
+    humanColor : '#0004ff',
+    mazeColor : '#ff9b9b',
+    coinColor : '#007c00'
+}
+
+class Player {
+	constructor(x, y) {
+		this.id = 'human';
+		this.x = x;
+		this.y = y;
+		this.color = colors.humanColor;
+		this.explored = new Set();
+		this.tempExplored = new Set();
+		this.tempTargetsFound = { gold: [] };
+		this.totalTargetsFound = { gold: [] };
+	}
+
+    spawn(){
+        this.x = randomIndex(mazeWidth);
+        this.y = randomIndex(mazeHeight);
+
+        console.log("from human.spawn: cell_" + this.y + "_" + this.x);
+
+        humanCell = document.getElementById("cell_" + this.y + "_" + this.x);
+        humanCell.style.backgroundColor = this.color;
+
+        
+    }
+
+    moveUp() {
+		if (this.y != 1 && humanCell.style["border-top"] == "none") {
+			--this.y;
+		}
+        this.refreshMap();
+	}
+
+	moveRight() {
+		if (this.x != mazeWidth && humanCell.style["border-right"] == "none") {
+			++this.x;
+		}
+        this.refreshMap();
+	}
+
+	moveDown() {
+		if (this.y != mazeHeight && humanCell.style["border-bottom"] == "none") {
+			++this.y;
+		}
+        this.refreshMap();
+	}
+
+    moveLeft() {
+		if (this.x != 1 && humanCell.style["border-left"] == "none") {
+			--this.x;
+		}
+        this.refreshMap();
+	}
+
+    refreshMap(){
+        humanCell.style.backgroundColor = colors.mazeColor;
+        humanCell = document.getElementById("cell_" + this.y + "_" + this.x);
+        humanCell.style.backgroundColor = this.color;
+
+        console.log("from refreshMap: cell_" + this.y + "_" + this.x);
+    }
+}
+
+var human = new Player(1,1);
+
+
+
 window.addEventListener("load", init);
+document.addEventListener("keydown", eventKeyHandlers);
+
+
+
+
 
 function init() {
     baseMaze();
     addCells();
+    addCoins();
+    human.spawn();
+}
+
+function addCoins(nbCoins=10){
+    var x,y;
+    var cell;
+    for(i=1; i <nbCoins; i++){
+        x= randomIndex(mazeWidth-1);
+        y = randomIndex(mazeHeight-1);
+
+        cell = document.getElementById("cell_" + y + "_" + x);
+        console.log("from addCoins: cell_" + y + "_" + x);
+
+        if (cell.getAttribute("isCoin")=="false"){
+            cell.style.backgroundColor = colors.coinColor;
+        }
+
+    }
 }
 
 function addCells() {
@@ -30,7 +127,7 @@ function addCells() {
     }
 }
 
-function addRoute(startAtRow, startAtCol, createDetour, backgroundColorRoute = "rgb(240, 0, 0)") {
+function addRoute(startAtRow, startAtCol, createDetour, backgroundColorRoute = colors.mazeColor) {
     var validExits = ["right", "bottom", "left", "top"];
     var remainingExits = {"right": mazeWidth, "bottom": mazeHeight, "left": 0, "top": 0};
     var nextExits = [];
@@ -86,7 +183,7 @@ function addRoute(startAtRow, startAtCol, createDetour, backgroundColorRoute = "
             }
         } 
 
-        exitIndex = Math.floor(Math.random() * Math.floor(nextExits.length));
+        exitIndex = randomIndex(nextExits.length);
         exit = nextExits[exitIndex];
         if (createDetour == false) {
             currentCell.style["border-"+exit] = "none";
@@ -162,7 +259,7 @@ function baseMaze() {
         for (colIndex = 1; colIndex <= mazeWidth; colIndex++) {
             var col = document.createElement("td");
             if (rowIndex == 1 && colIndex == 1 ) {
-                col.style.backgroundColor = "rgb(244,0,0)";
+                col.style.backgroundColor = colors.mazeColor;
                 col.setAttribute("type", "start");
             }
             // else if (rowIndex == mazeHeight && colIndex == mazeWidth) {                
@@ -170,10 +267,11 @@ function baseMaze() {
             //     col.setAttribute("type", "finish");
             // } 
             else {
-                col.style.backgroundColor = "rgb(255,255,255)";
+                col.style.backgroundColor = colors.mazeColor;
             }
             col.setAttribute("id", "cell_" + rowIndex + "_" + colIndex);  
-            console.log(col);          
+            col.setAttribute("isCoin", "false");
+            //console.log(col);          
             row.appendChild(col);
         }
         tbody.appendChild(row);
@@ -181,4 +279,59 @@ function baseMaze() {
     
     table.appendChild(tbody);
     document.getElementById("maze_container").appendChild(table);
+}
+
+// human controls
+function eventKeyHandlers(e) {
+	switch (e.keyCode) {
+			case 65: // a
+			case 37: // left arrow
+			case 72: // h
+				//e.preventDefault();
+				human.moveLeft();
+				break;
+			case 87: // w
+			case 38: // up arrow
+			case 75: // k
+				e.preventDefault();
+				human.moveUp();
+				break;
+			case 68: // d
+			case 39: // right arrow
+			case 76: // l
+				e.preventDefault();
+				human.moveRight();
+				break;
+			case 83: // s
+			case 40: // down arrow
+			case 74: // j
+				e.preventDefault();
+				human.moveDown();
+				break;
+			case 32: // space bar
+				e.preventDefault();
+				human.pickTarget();
+				break;
+			// case 49: // 1
+			// 	e.preventDefault();
+			// 	// data[half].movement.push({ key: e.key, t: Math.round((performance.now()/1000) * 100)/100 });
+			// 	updateScrollingPosition(agent1.x, agent1.y);
+			// 	break;
+			// case 50: // 2
+			// 	e.preventDefault();
+			// 	// data[half].movement.push({ key: e.key, t: Math.round((performance.now()/1000) * 100)/100 });
+			// 	updateScrollingPosition(agent2.x, agent2.y);
+			default: // nothing
+				break;
+		}
+		throttle = setTimeout(() => {
+			throttle = null;
+		}, 50);
+}
+
+
+
+//returns an int between one and max included
+function randomIndex(max){
+    return Math.floor(Math.random() * max) + 1;
 }

@@ -7,7 +7,39 @@
 </head>
 
 <body>
-    <div id="maze_container"></div>
+<!-- Table with Move Buttons and Maze -->
+<table id ="main_container" width="100%"> 
+    <tr>
+        <td width="30%">
+            <!-- Table with Move Buttons -->
+            <div id="MoveButtons" style="align-self: center;">
+                <table width="100%" style="align-content: center;">
+                    <tr width="33%">
+                        <td></td>
+                        <td style="align-self: center;"><button id="goUpButton" onclick="human.moveUp()">Up</button></td> 
+                        <td></td>
+                    </tr>
+                    <tr width="33%">
+                        <td><button id="goLeftButton" onclick="human.moveLeft()">Left</button></td>
+                        <td><button id="pickUpButton" onclick="human.pickUp()">Pick Up</button></td>
+                        <td><button id="goRightButton" onclick="human.moveRight()">Right</button></td>
+                    </tr>
+                    <tr width="33%">
+                        <td></td>
+                        <td><button id="goDownButton" onclick="human.moveDown()">Down</button></td>
+                        <td></td>
+                    </tr>
+                </table>
+            </div>
+        </td>
+
+        <!--Maze box-->
+        <td id="maze_container" width="70%">
+        </td>
+
+    </tr>
+</table>
+    
 </body>
 
 
