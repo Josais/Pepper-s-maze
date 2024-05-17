@@ -8,7 +8,7 @@ html, body  {
     position: absolute ;
 }
 
-div#main_container {
+/* div#main_container {
     
     margin-top: 50px;
     display: grid;
@@ -17,7 +17,7 @@ div#main_container {
     gap: 1px 1px;
     grid-template-areas: ". .";
 
-}
+} */
 
 div#maze_container {
 
@@ -30,7 +30,8 @@ div#maze_container {
     margin: 0 auto;
     position: relative;
     border: 2px #000000 solid;
-    margin-top: 5em;
+    /* margin-top: 5em; */
+    color: #007c00;
 }
 
 table {

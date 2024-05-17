@@ -8,8 +8,19 @@
 
 <body>
 <!-- Table with Move Buttons and Maze -->
-<table id ="main_container" width="100%"> 
-    <tr>
+
+<table id ="main_container" width="100%" height="100%"> 
+    <tr id="topScreen" height="3%">
+        <td>
+            <div id="tempScore_container" style="align-content: center;"></div>
+        </td>
+        <td>
+            <div id="timer" width="100%">timer</div>
+        </td>
+
+    </tr>
+
+    <tr height="90%">
         <td width="30%">
             <!-- Table with Move Buttons -->
             <div id="MoveButtons" style="align-self: center;">
@@ -34,7 +45,8 @@
         </td>
 
         <!--Maze box-->
-        <td id="maze_container" width="70%">
+        <td id="maze_box" width="70%">
+            <div id="maze_container"></div>
         </td>
 
     </tr>

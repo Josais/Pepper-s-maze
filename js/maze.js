@@ -1,11 +1,20 @@
-const mazeWidth = 20;
+const mazeWidth = 10;
 const mazeHeight = mazeWidth;
+const nbCoins = 10;
 
 let humanCell;
+let teamScore;
+let currentRound = 1;
+
+const pepperBehaviour=[ //one for performance failure, one for morality failure
+    {decision: "indiv", coins: 1},
+    {deicison: "indiv", coins: 3}
+]
 
 const colors = {
     humanColor : '#0004ff',
     mazeColor : '#ff9b9b',
+    blankMazeColor: '#ffffff',
     coinColor : '#007c00'
 }
 
@@ -15,10 +24,11 @@ class Player {
 		this.x = x;
 		this.y = y;
 		this.color = colors.humanColor;
-		this.explored = new Set();
-		this.tempExplored = new Set();
-		this.tempTargetsFound = { gold: [] };
-		this.totalTargetsFound = { gold: [] };
+		// this.explored = new Set();
+		// this.tempExplored = new Set();
+		this.tempCoinsFound = 0;
+		this.totalCoinsFound = 0;
+        this.indivScore = 0;
 	}
 
     spawn(){
@@ -29,8 +39,6 @@ class Player {
 
         humanCell = document.getElementById("cell_" + this.y + "_" + this.x);
         humanCell.style.backgroundColor = this.color;
-
-        
     }
 
     moveUp() {
@@ -62,25 +70,100 @@ class Player {
 	}
 
     refreshMap(){
-        humanCell.style.backgroundColor = colors.mazeColor;
-        humanCell = document.getElementById("cell_" + this.y + "_" + this.x);
-        humanCell.style.backgroundColor = this.color;
+        humanCell.style.backgroundColor = colors.mazeColor; //previous cell
+
+        humanCell = document.getElementById("cell_" + this.y + "_" + this.x); //get the new cell
+
+        if(humanCell.getAttribute("isCoin") == "true"){ //if coin, collect
+            this.pickCoin();
+        }
+
+        humanCell.style.backgroundColor = this.color; //actual move, color the cell as the character
 
         console.log("from refreshMap: cell_" + this.y + "_" + this.x);
     }
+
+    pickCoin(){
+        this.tempCoinsFound++;
+        humanCell.setAttribute("isCoin", "false");
+        console.log("number of coins : " + this.tempCoinsFound);
+        document.getElementById("tempScore_container").innerHTML = "tempCoins = " + this.tempCoinsFound.toString();
+
+        if(this.tempCoinsFound==nbCoins){
+            endOfRound();
+        }
+    }
+
+    updateIndivScore(coins){
+        this.indivScore += coins;
+    }
+
+    // get tempCoinsFound(){ //y a un soucis ici, avec ça fonctionne pas
+    //     return this.tempCoinsFound;
+    // }
+
+    // set indivScore(x){
+    //     this.indivScore = this.indivScore + x;
+    // }
+
+    
+
 }
 
 var human = new Player(1,1);
 
 
-
+//EVENT LISTENERS ================================================================================
 window.addEventListener("load", init);
 document.addEventListener("keydown", eventKeyHandlers);
 
+//ROUND FUNCTIONS (SCORES, TIMERS, QUESTIONS) =============================================================
+function endOfRound(){ //need to finish
+    var center = document.getElementById("maze_container");
+    center.innerHTML = "Try";
+    center.style.backgroundColor = black;
+
+    //TODO
+}
+
+function addTeamScore(){ //if human chooses team
+    if(pepperBehaviour[currentRound].decision == "team"){ //both chose team
+        decisionTeamTeam(human.tempCoinsFound,pepperBehaviour[currentRound].coins);
+    }else{
+        decisionIndivTeam(human.tempCoinsFound,pepperBehaviour[currentRound].coins);
+    }
+    resultsEndOfRound();
+}
+
+function addIndivScore(){ //if human chooses indiv
+    //TODO
+}
+
+function decisionTeamTeam(coinsHuman, coinsPepper){
+    teamScore = teamScore + 2 * coinsHuman * coinsPepper;
+}
+
+function decisionIndivIndiv(coinsHuman, coinsPepper){
+    human.updateIndivScore(coinsHuman); //human score update
+    //TODO: pepper score update
+}
+
+function decisionIndivTeam(coinsHuman,coinsPepper){//Pepper indiv, human Team
+    //TODO
+}
+
+function decisionTeamIndiv(coinsHuman,coinsPepper){ //pepper team, human indiv
+    //TODO
+}
+
+function resultsEndOfRound(){ // what happens once choice done: new page, show all scores and msg Pepper ; both questions end of round ; after the questions, button nextRound
+    //TODO
+
+}
 
 
 
-
+//VARIOUS MAZE CREATIONS FUNCTIONS ===============================================================
 function init() {
     baseMaze();
     addCells();
@@ -88,10 +171,10 @@ function init() {
     human.spawn();
 }
 
-function addCoins(nbCoins=10){
+function addCoins(){
     var x,y;
     var cell;
-    for(i=1; i <nbCoins; i++){
+    for(i=0; i <nbCoins; i++){
         x= randomIndex(mazeWidth-1);
         y = randomIndex(mazeHeight-1);
 
@@ -100,6 +183,9 @@ function addCoins(nbCoins=10){
 
         if (cell.getAttribute("isCoin")=="false"){
             cell.style.backgroundColor = colors.coinColor;
+            cell.setAttribute("isCoin", "true");
+        } else{
+            i--;
         }
 
     }
@@ -136,7 +222,6 @@ function addRoute(startAtRow, startAtCol, createDetour, backgroundColorRoute = c
 	var colIndex = startAtCol;
     var currentCell = document.getElementById("cell_" + rowIndex + "_" + colIndex);
     var exit;
-    var lastExit;
     var exitIndex;
     var loop = 0;
     var loopFuse = 0;
@@ -248,7 +333,6 @@ function addRoute(startAtRow, startAtCol, createDetour, backgroundColorRoute = c
 }
 
 function baseMaze() {
-
     var rowIndex, colIndex;
 
     var table = document.createElement("table");
@@ -259,7 +343,7 @@ function baseMaze() {
         for (colIndex = 1; colIndex <= mazeWidth; colIndex++) {
             var col = document.createElement("td");
             if (rowIndex == 1 && colIndex == 1 ) {
-                col.style.backgroundColor = colors.mazeColor;
+                col.style.backgroundColor = colors.blankMazeColor;
                 col.setAttribute("type", "start");
             }
             // else if (rowIndex == mazeHeight && colIndex == mazeWidth) {                
@@ -267,7 +351,7 @@ function baseMaze() {
             //     col.setAttribute("type", "finish");
             // } 
             else {
-                col.style.backgroundColor = colors.mazeColor;
+                col.style.backgroundColor = colors.blankMazeColor;
             }
             col.setAttribute("id", "cell_" + rowIndex + "_" + colIndex);  
             col.setAttribute("isCoin", "false");
@@ -278,16 +362,26 @@ function baseMaze() {
     }
     
     table.appendChild(tbody);
+    
+
+    mazeBoxInfo = document.getElementById("maze_box").getBoundingClientRect();
+    sizeMaze = Math.min(mazeBoxInfo.height,mazeBoxInfo.width) - 10;
+
+    document.getElementById("maze_container").style.height = sizeMaze;
+    document.getElementById("maze_container").style.width = sizeMaze;
+
     document.getElementById("maze_container").appendChild(table);
 }
 
-// human controls
+
+
+//HUMAN CONTROLS ON KEYBOARD ===================================================================================
 function eventKeyHandlers(e) {
 	switch (e.keyCode) {
 			case 65: // a
 			case 37: // left arrow
 			case 72: // h
-				//e.preventDefault();
+				e.preventDefault();
 				human.moveLeft();
 				break;
 			case 87: // w
@@ -312,15 +406,6 @@ function eventKeyHandlers(e) {
 				e.preventDefault();
 				human.pickTarget();
 				break;
-			// case 49: // 1
-			// 	e.preventDefault();
-			// 	// data[half].movement.push({ key: e.key, t: Math.round((performance.now()/1000) * 100)/100 });
-			// 	updateScrollingPosition(agent1.x, agent1.y);
-			// 	break;
-			// case 50: // 2
-			// 	e.preventDefault();
-			// 	// data[half].movement.push({ key: e.key, t: Math.round((performance.now()/1000) * 100)/100 });
-			// 	updateScrollingPosition(agent2.x, agent2.y);
 			default: // nothing
 				break;
 		}
@@ -330,8 +415,7 @@ function eventKeyHandlers(e) {
 }
 
 
-
-//returns an int between one and max included
-function randomIndex(max){
+//TOOLBOX ==================================================================================
+function randomIndex(max){//returns an int between one and max included
     return Math.floor(Math.random() * max) + 1;
 }
