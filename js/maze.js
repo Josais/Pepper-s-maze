@@ -1,15 +1,12 @@
 const mazeWidth = 10;
 const mazeHeight = mazeWidth;
 const nbCoins = 10;
+const roundPerGame = 2;
+const gamePerExperiment = 2;
 
-let humanCell;
-let teamScore =0, roundTeamScore=0, pepperIndivScore=0;
-let currentRound = 1;
-
-const pepperBehaviour=[ //one for performance failure, one for morality failure
-    {decision: "indiv", coins: 1},
-    {deicison: "indiv", coins: 3}
-]
+const strats = ["apology", "denial", "compensation"]; //one of those is chosen just once
+let failures = ["morality","performance"]; //one is chosen for the first game, the other for the second game
+let stratType,failType;
 
 const colors = {
     humanColor : '#0004ff',
@@ -18,7 +15,26 @@ const colors = {
     coinColor : '#007c00'
 }
 
-let EORquestions = [];
+const dbIDWords = ["sample", "theory", "income", "judgment", "cookie", "highway", "bathroom", "estate", "drama", "wedding", "person", "patience", "basket", "girlfriend", "concept", "driver", "housing", "contract", "outcome", "problem", "context", "coffee", "product", "garbage", "fishing", "payment", "buyer", "shopping", "airport", "boyfriend", "power", "friendship", "safety", "county", "data", "storage", "language", "basis", "dinner", "topic", "success", "teaching", "system", "orange", "movie", "woman", "presence", "science", "climate", "sector"]; //TODO: besoin de former une meilleure base, les mots sont nuls
+let participantID = randomID(4,"false");
+
+const pepperBehaviour=[ 
+    //TODO: one for performance failure, one for morality failure
+    {decision: "indiv", coins: 1},
+    {decision: "indiv", coins: 3}
+]
+
+let timer;
+let ms, sec, min;
+
+let humanCell;
+let teamScore =0, roundTeamScore=0, pepperIndivScore=0;
+let currentRound = 1;
+let currentGame = 1;
+
+let history = []; //{humanIndiv, teamScore, totalCoinsGameHuman, pastChoices, EORquestions, EOGquestion [game]}
+
+let EORquestions = [], EOGquestions =[];
 
 class Player {
 	constructor(x, y) {
@@ -26,8 +42,6 @@ class Player {
 		this.x = x;
 		this.y = y;
 		this.color = colors.humanColor;
-		// this.explored = new Set();
-		// this.tempExplored = new Set();
 		this.tempCoinsFound = 0;
 		this.totalCoinsFound = 0;
         this.indivScore = 0;
@@ -35,15 +49,13 @@ class Player {
 	}
 
     spawn(){
-        this.x = randomIndex(mazeWidth);
-        this.y = randomIndex(mazeHeight);
+        this.x = randomIndex(mazeWidth) +1;
+        this.y = randomIndex(mazeHeight) +1;
 
         console.log("from human.spawn: cell_" + this.y + "_" + this.x);
 
         humanCell = document.getElementById("cell_" + this.y + "_" + this.x);
         humanCell.style.backgroundColor = this.color;
-
-        //endOfRound(); //will need to erase once end of round is managed
     }
 
     moveUp() {
@@ -84,20 +96,13 @@ class Player {
         }
 
         humanCell.style.backgroundColor = this.color; //actual move, color the cell as the character
-
-        console.log("from refreshMap: cell_" + this.y + "_" + this.x);
     }
 
     pickCoin(){
         this.tempCoinsFound++;
         humanCell.setAttribute("isCoin", "false");
-        console.log("number of coins : " + this.tempCoinsFound);
-        document.getElementById("tempScore_container").innerHTML = "tempCoins = " + this.tempCoinsFound.toString();
-        console.log("pickCoins: "+ document.getElementById("tempScore_container").className);
-
-        if(this.tempCoinsFound==nbCoins){
-            endOfRound();
-        }
+        //console.log("number of coins : " + this.tempCoinsFound);
+        document.getElementById("tempScore_container").innerHTML = "Coins collected this round = " + this.tempCoinsFound.toString();
     }
 
     updateIndivScore(choice){
@@ -109,219 +114,98 @@ class Player {
         this.pastChoices.push(choice);
         console.log(this.pastChoices);
     }
-
-    // get tempCoinsFound(){ //y a un soucis ici, avec ça fonctionne pas
-    //     return this.tempCoinsFound;
-    // }
-
-    // set indivScore(x){
-    //     this.indivScore = this.indivScore + x;
-    // }
-
-    
-
 }
 
 var human = new Player(1,1);
 
 
 //EVENT LISTENERS ================================================================================
-window.addEventListener("load", init);
+window.addEventListener("load", startExperiment);
 document.addEventListener("keydown", eventKeyHandlers);
 
-//ROUND FUNCTIONS (SCORES, TIMERS, QUESTIONS) =============================================================
-function endOfRound(){
+//WELCOME PAGE ETC =========================================================================================
+function startExperiment(){ 
+    //TODO: add short explanation of ID and instruction to put it in the questionnaire
+    //TODO: add instruction to fill in first part of questionnaire (dispo trust)
+    //TODO: say that once that is done, click on next
+
+    //TODO: need to check the tutorial, but will wait on meeting with Maartje on Tuesday
+    console.log(participantID);
+
+    var container = document.getElementById("main_container");
+    container.innerHTML="<h1>Welcome!</h1><p>Short explanation for the game and the random id thingy</p><br><div id='participantID'></div><button id='tutorial'>Tutorial</button><button id='launchGame' onclick='init()'>Launch Experiment</button>";
+
+    var participant = document.getElementById("participantID");
+    participant.innerHTML = participantID;
+}
+
+function init() {
+    if(currentGame==1 && currentRound==1){
+        stratType = strats[randomIndex(strats.length)];
+    }
+    if(currentRound==1){
+        let f = randomIndex(failures.length);
+        failType = failures[f];
+        failures.splice(f,1);
+
+        console.log("stratType= " +stratType + "; failtype= " + failType + "; failures= " + failures);
+    }
+
+    var container = document.getElementById("main_container");
+    container.innerHTML=`<div id='tempScore_container' class='tempScore'>Coins collected this round = 0</div><div id='round' class='round'>Round ${currentRound}/${roundPerGame}</div><div id='timer_container' class='timer'></div><div id='timer_c'></div><button id='goUpButton' onclick='human.moveUp()' class='upButton'>Up</button> </br><button id='goLeftButton' onclick='human.moveLeft()' class='leftButton'>Left</button><div id='maze_container' class = 'maze_container'></div><button id='goRightButton' onclick='human.moveRight()' class='rightButton'>Right</button></br><button id='goDownButton' onclick='human.moveDown()' class='downButton'>Down</button>`;
+
     var center = document.getElementById("maze_container");
    
     center.style.backgroundColor = '#000000';
     center.style.alignContent = 'center';
-    center.innerHTML = "<p>You won " + human.tempCoinsFound + " coins this round. You can know choose to add this amount to your team score or to your individual score.</p></br><button id='addTeam' class='choiceButton' onclick='addTeamScore()'>Add to Team Score</button> <button id='addIndiv' class='choiceButton' onclick='addIndivScore()'>Add to Individual Score</button>";
-    //TODO: add the message to remind the calculation? Need to check timea's
+    center.innerHTML = "<button id='goRound' class='goRound' onclick='launchRound()'>Start round</button>";
 }
 
-function addTeamScore(){ //if human chooses team
-    console.log("chose team");
-    if(pepperBehaviour[currentRound-1].decision == "team"){ //both chose team
-        roundTeamScore = 2 * human.tempCoinsFound * pepperBehaviour[currentRound-1].coins;
-        teamScore += roundTeamScore;
-    }else{
-        roundTeamScore = 0;
-        pepperIndivScore += pepperBehaviour[currentRound-1].coins;
-    }
-    human.updateIndivScore("team");
-    resultsEndOfRound();
-}
-
-function addIndivScore(){ //if human chooses indiv
-    console.log("chose indiv");
-    if(pepperBehaviour[currentRound-1].decision == "indiv"){ //both chose indiv
-        pepperIndivScore += pepperBehaviour[currentRound-1].coins;
-    }
-    human.updateIndivScore("indiv");
-    resultsEndOfRound();
-}
-
-function resultsEndOfRound(){ // what happens once choice done: new page, show all scores and msg Pepper ; both questions end of round ; after the questions, button nextRound
-    var container = document.getElementById("main_container");
-    container.innerHTML="";
-    //container.style.backgroundColor = '#ffffff';
-
-    //this round number of coins for both
-    var coinsRound = document.createElement("div");
-    coinsRound.innerHTML = "<p>You collected " + human.tempCoinsFound + " coin(s) and Pepper collected "+ pepperBehaviour[currentRound-1].coins + " coin(s). </p>";
-    container.appendChild(coinsRound);
-
-    var allScores = document.createElement("div");
-    var recap = document.createElement("div");
-    var recapTxt = "";
-
-    //recap of this round allocation choices
-    if(human.pastChoices[currentRound-1] == "team" && pepperBehaviour[currentRound-1].decision == "team"){ //both chose team
-        recapTxt += "<p>This round, Pepper and you both chose to collaborate and to add to the team score! </p>"
-    }else if(human.pastChoices[currentRound-1] == "team" && pepperBehaviour[currentRound-1].decision == "indiv"){ //pepper indiv, human team
-        recapTxt += "<p>Unfortunately, even though you chose to collaborate, Pepper chose to add its coins to its own individual score.</p>"
-    }else if(human.pastChoices[currentRound-1] == "indiv" && pepperBehaviour[currentRound-1].decision == "team"){ //pepper team, human indiv
-        recapTxt += "<p>Unfortunately for Pepper, it chose to collaborate while you did not.</p>"
-
-    }else if(human.pastChoices[currentRound-1] == "indiv" && pepperBehaviour[currentRound-1].decision == "indiv"){ //both indiv
-        recapTxt += "<p>This round, you both chose to add your coins to your individual scores.</p>"
-    }
-
-    if(human.pastChoices[currentRound-1] == "team" && pepperBehaviour[currentRound-1].decision == "team"){
-        recapTxt += "<p>This means that the team score for this round is " + roundTeamScore +"! </p>";
-    }else{
-        recapTxt += "<p>There was no successful teamwork in this round :(</p>";
-    }
-
-    recap.innerHTML = recapTxt;
-    allScores.appendChild(recap);
-
-    //team score
-    var table = document.createElement("div");
-    var humancontribution, peppercontribution;
-    if(human.pastChoices[currentRound-1] == "indiv"){
-        humancontribution = 0;
-    }else{
-        humancontribution = human.tempCoinsFound;
-    }
-    if(pepperBehaviour[currentRound-1].decision == "indiv"){
-        peppercontribution = 0;
-    }else{
-        peppercontribution = pepperBehaviour[currentRound-1].coins;
-    }
-    table.innerHTML = "<table><tr><td>2</td><td>x</td><td style='border-bottom: 1px;'>" + peppercontribution +"</td><td>x</td><td style='border-bottom: 1px;'>" + humancontribution +"</td><td>=</td><td>"+ roundTeamScore +"</td></tr><tr><td></td><td></td><td>Pepper's contribution</td><td></td><td>Your contribution</td><td></td><td>Team round score</td></tr></table>";
-    allScores.appendChild(table);
-
-    //tous les scores actuels (jeu en général, pas juste round)
-    var endRoundNewScores = document.createElement("div");
-    var allScoresTxt = "</br><p>Your current individual score: " + human.indivScore +"; Pepper's current individual score: "+ pepperIndivScore+ "; current team score: " + teamScore +".</p>"; 
-    endRoundNewScores.innerHTML = allScoresTxt;
-    allScores.appendChild(endRoundNewScores);
-    
-    container.appendChild(allScores);
-
-    var nextButton = document.createElement("button");
-    nextButton.innerHTML= "Next";
-    nextButton.setAttribute("onclick","gotoEORQuestion()");
-    container.appendChild(nextButton);
-
-    //TODO: will need to add Pepper's message
-}
-
-function gotoEORQuestion(){
-    var container = document.getElementById("main_container");
-    container.innerHTML="";
-
-    // var question = document.createElement("form");
-    // question.innerHTML = "How much trust do you have in Pepper's performance and honesty? </br> <input type='radio' id='radioONE' value='1' name='EORquestion'><label for='radioONE'>1 - Not at all</label></br><input type='radio' id='radioTWO' value='2' name='EORquestion'><label for='radioTWO'>2</label></br><input type='radio' id='radioTHREE' value='3' name='EORquestion'><label for='radioTHREE'>3</label></br><input type='radio' id='radioFOUR' value='4' name='EORquestion' checked><label for='radioFOUR'>4 - Moderately</label></br><input type='radio' id='radioFIVE' value='5' name='EORquestion'><label for='radioFIVE'>5</label></br><input type='radio' id='radioSIX' value='6' name='EORquestion'><label for='radioSIX'>6</label></br><input type='radio' id='radioSEVEN' value='7' name='EORquestion'><label for='radioSEVEN'>7 - Completely</label>";
-    // container.appendChild(question);
-
-    var question = document.createElement("div");
-    question.innerHTML = "<p>How much trust do you have in Pepper's performance and honesty?</p></br><button class='EORbutton' onclick='submitEORQuestion1()'>1 - Not at all</button><button class='EORbutton' onclick='submitEORQuestion2()'>2</button><button class='EORbutton' onclick='submitEORQuestion3()'>3</button><button class='EORbutton' onclick='submitEORQuestion4()'>4 - Moderately</button><button class='EORbutton' onclick='submitEORQuestion5()'>5</button><button class='EORbutton' onclick='submitEORQuestion6()'>6</button><button class='EORbutton' onclick='submitEORQuestion7()'>7 - Completely</button>";
-    container.appendChild(question);
-
-    // var submitButton = document.createElement("button"); //je pense pas que ça va fonctionner, y a probablement que le submit pour récupérer les données... mais ça semble refresh la page du début et envoyer vers le maze de nouveau. Donc bon. Peut-être abandonner le form et utiliser des pitits boutons ? peut-être plus facile sur écran en vrai. Et ensuite tous les boutons renvoient vers la même fonction qui garde la réponse dans un []. Ouep, probablement le plus simple
-    // submitButton.innerHTML = 'Submit and go to next round';
-    // submitButton.setAttribute("onclick","");
-    // container.appendChild(submitButton);
-}
-
-function submitEORQuestion1(){
-    EORquestions.push(1);
-    console.log("one");
-    nextRound();
-}
-function submitEORQuestion2(){
-    EORquestions.push(2);
-    console.log("two");
-    nextRound();
-}
-function submitEORQuestion3(){
-    EORquestions.push(3);
-    console.log("three");
-    nextRound();
-}
-function submitEORQuestion4(){
-    EORquestions.push(4);
-    console.log("four");
-    nextRound();
-}
-function submitEORQuestion5(){
-    EORquestions.push(5);
-    console.log("five");
-    nextRound();
-}
-function submitEORQuestion6(){
-    EORquestions.push(6);
-    console.log("six");
-    nextRound();
-}
-function submitEORQuestion7(){
-    EORquestions.push(7);
-    console.log("seven");
-    nextRound();
-}
-
-function nextRound(){
-    //to reset for the next round
-    human.tempCoinsFound = 0;
-    currentRound++;
-
-    var container = document.getElementById("main_container");
-    container.innerHTML="<div id='tempScore_container' class='tempScore'></div><div id='timer' class='timer'>timer</div><button id='goUpButton' onclick='human.moveUp()' class='upButton'>Up</button> </br><button id='goLeftButton' onclick='human.moveLeft()' class='leftButton'>Left</button><div id='maze_container' class = 'maze_container'></div><button id='goRightButton' onclick='human.moveRight()' class='rightButton'>Right</button></br><button id='goDownButton' onclick='human.moveDown()' class='downButton'>Down</button>";
-
-    init();
-    console.log(human.indivScore +"; "+ pepperIndivScore+ "; " + teamScore);
-}
-
-
-
-//VARIOUS MAZE CREATIONS FUNCTIONS ===============================================================
-function init() {
+function launchRound(){
     baseMaze();
     addCells();
     addCoins();
     human.spawn();
+
+    startTimer();
 }
 
-function addCoins(){
-    var x,y;
-    var cell;
-    for(i=0; i <nbCoins; i++){
-        x= randomIndex(mazeWidth-1);
-        y = randomIndex(mazeHeight-1);
+//VARIOUS MAZE CREATIONS FUNCTIONS ===============================================================
+function baseMaze() {
+    var rowIndex, colIndex;
 
-        cell = document.getElementById("cell_" + y + "_" + x);
-        console.log("from addCoins: cell_" + y + "_" + x);
+    var table = document.createElement("table");
+    var tbody = document.createElement("tbody");
 
-        if (cell.getAttribute("isCoin")=="false"){
-            cell.style.backgroundColor = colors.coinColor;
-            cell.setAttribute("isCoin", "true");
-        } else{
-            i--;
+    for (rowIndex = 1; rowIndex <= mazeHeight; rowIndex++) {
+        var row = document.createElement("tr");
+        for (colIndex = 1; colIndex <= mazeWidth; colIndex++) {
+            var col = document.createElement("td");
+            if (rowIndex == 1 && colIndex == 1) {
+                col.style.backgroundColor = colors.blankMazeColor;
+                col.setAttribute("type", "start");
+            }
+            else {
+                col.style.backgroundColor = colors.blankMazeColor;
+            }
+            col.setAttribute("id", "cell_" + rowIndex + "_" + colIndex);  
+            col.setAttribute("isCoin", "false");
+            //console.log(col);          
+            row.appendChild(col);
         }
-
+        tbody.appendChild(row);
     }
+    
+    table.appendChild(tbody);
+    
+    // mazeBoxInfo = document.getElementById("maze_box").getBoundingClientRect();
+    // sizeMaze = Math.min(mazeBoxInfo.height,mazeBoxInfo.width) - 10;
+
+    // document.getElementById("maze_container").style.height = sizeMaze;
+    // document.getElementById("maze_container").style.width = sizeMaze;
+
+    document.getElementById("maze_container").innerHTML ="";
+    document.getElementById("maze_container").appendChild(table);
 }
 
 function addCells() {
@@ -465,44 +349,310 @@ function addRoute(startAtRow, startAtCol, createDetour, backgroundColorRoute = c
 
 }
 
-function baseMaze() {
-    var rowIndex, colIndex;
+function addCoins(){
+    var x,y;
+    var cell;
+    for(i=0; i <nbCoins; i++){
+        x= randomIndex(mazeWidth)+1;
+        y = randomIndex(mazeHeight)+1;
 
-    var table = document.createElement("table");
-    var tbody = document.createElement("tbody");
+        console.log(x + " : " + y);
 
-    for (rowIndex = 1; rowIndex <= mazeHeight; rowIndex++) {
-        var row = document.createElement("tr");
-        for (colIndex = 1; colIndex <= mazeWidth; colIndex++) {
-            var col = document.createElement("td");
-            if (rowIndex == 1 && colIndex == 1) {
-                col.style.backgroundColor = colors.blankMazeColor;
-                col.setAttribute("type", "start");
-            }
-            else {
-                col.style.backgroundColor = colors.blankMazeColor;
-            }
-            col.setAttribute("id", "cell_" + rowIndex + "_" + colIndex);  
-            col.setAttribute("isCoin", "false");
-            //console.log(col);          
-            row.appendChild(col);
+        cell = document.getElementById("cell_" + y + "_" + x);
+        //console.log("from addCoins: cell_" + y + "_" + x);
+
+        if (cell.getAttribute("isCoin")=="false"){
+            cell.style.backgroundColor = colors.coinColor;
+            cell.setAttribute("isCoin", "true");
+        } else{
+            i--;
         }
-        tbody.appendChild(row);
+
     }
-    
-    table.appendChild(tbody);
-    
-
-    // mazeBoxInfo = document.getElementById("maze_box").getBoundingClientRect();
-    // sizeMaze = Math.min(mazeBoxInfo.height,mazeBoxInfo.width) - 10;
-
-    // document.getElementById("maze_container").style.height = sizeMaze;
-    // document.getElementById("maze_container").style.width = sizeMaze;
-
-    document.getElementById("maze_container").appendChild(table);
 }
 
 
+//TIMER =========================================================================================================
+function timerManager() {
+    ms--;
+    if(min == 0 && sec == 0 && ms == 0){
+        stopTimer();
+        endOfRound();
+    }
+    if(ms == 0 && sec != 0){
+        sec--;
+        ms = 100;
+    }
+    if(sec == 0 && min != 0){
+        min--;
+        sec = 60;
+    }
+
+    //Doing some string interpolation
+    let milli = ms < 10 ? "0"+ ms : ms;
+    let seconds = sec < 10 ? "0"+ sec : sec;
+    let minute = min < 10 ? "0" + min : min;
+
+    let txt= `${minute}:${seconds}:${milli}`;
+    timer.innerHTML =txt;
+};
+
+function startTimer(){
+    timer =  document.getElementById("timer_container");
+    
+    ms = 99;
+    sec = 15;
+    min = 0;
+
+    timer.innerHTML = `${min}:${sec}:${ms}`;
+    console.log(timer);
+
+    time = setInterval(timerManager,10);
+}
+
+function stopTimer(){
+    clearInterval(time);
+}
+
+//EOR (SCORES, QUESTIONS...) =============================================================
+function endOfRound(){
+    var center = document.getElementById("maze_container");
+   
+    center.style.backgroundColor = '#000000';
+    center.style.alignContent = 'center';
+    center.innerHTML = "<p>You won " + human.tempCoinsFound + " coins this round. You can know choose to add this amount to your team score or to your individual score.</p></br><button id='addTeam' class='choiceButton' onclick='addTeamScore()'>Add to Team Score</button> <button id='addIndiv' class='choiceButton' onclick='addIndivScore()'>Add to Individual Score</button>";
+    //TODO: add the message to remind the calculation? Need to check timea's
+}
+
+function addTeamScore(){ //if human chooses team
+    console.log("chose team");
+    if(pepperBehaviour[currentRound-1].decision == "team"){ //both chose team
+        roundTeamScore = 2 * human.tempCoinsFound * pepperBehaviour[currentRound-1].coins;
+        teamScore += roundTeamScore;
+    }else{
+        roundTeamScore = 0;
+        pepperIndivScore += pepperBehaviour[currentRound-1].coins;
+    }
+    human.updateIndivScore("team");
+    resultsEndOfRound();
+}
+
+function addIndivScore(){ //if human chooses indiv
+    console.log("chose indiv");
+    if(pepperBehaviour[currentRound-1].decision == "indiv"){ //both chose indiv
+        pepperIndivScore += pepperBehaviour[currentRound-1].coins;
+    }
+    human.updateIndivScore("indiv");
+    resultsEndOfRound();
+}
+
+function resultsEndOfRound(){ //TODO: correct all texts, improve
+    var container = document.getElementById("main_container");
+    container.innerHTML="";
+    //container.style.backgroundColor = '#ffffff';
+
+    //this round number of coins for both
+    var coinsRound = document.createElement("div");
+    coinsRound.innerHTML = "<p>You collected " + human.tempCoinsFound + " coin(s) and Pepper collected "+ pepperBehaviour[currentRound-1].coins + " coin(s). </p>";
+    container.appendChild(coinsRound);
+
+    var allScores = document.createElement("div");
+    var recap = document.createElement("div");
+    var recapTxt = "";
+
+    console.log("pepper choice " +pepperBehaviour[currentRound-1].decision);
+
+    //recap of this round allocation choices
+    if(human.pastChoices[currentRound-1] == "team" && pepperBehaviour[currentRound-1].decision == "team"){ //both chose team
+        recapTxt += "<p>This round, Pepper and you both chose to collaborate and to add to the team score! </p>"
+    }else if(human.pastChoices[currentRound-1] == "team" && pepperBehaviour[currentRound-1].decision == "indiv"){ //pepper indiv, human team
+        recapTxt += "<p>Unfortunately, even though you chose to collaborate, Pepper chose to add its coins to its own individual score.</p>"
+    }else if(human.pastChoices[currentRound-1] == "indiv" && pepperBehaviour[currentRound-1].decision == "team"){ //pepper team, human indiv
+        recapTxt += "<p>Unfortunately for Pepper, it chose to collaborate while you did not.</p>"
+    }else if(human.pastChoices[currentRound-1] == "indiv" && pepperBehaviour[currentRound-1].decision == "indiv"){ //both indiv
+        recapTxt += "<p>This round, you both chose to add your coins to your individual scores.</p>"
+    }
+
+    if(human.pastChoices[currentRound-1] == "team" && pepperBehaviour[currentRound-1].decision == "team"){
+        recapTxt += "<p>This means that the team score for this round is " + roundTeamScore +"! </p>";
+    }else{
+        recapTxt += "<p>There was no successful teamwork in this round :(</p>";
+    }
+
+    recap.innerHTML = recapTxt;
+    allScores.appendChild(recap);
+
+    //team score
+    var table = document.createElement("div");
+    var humancontribution, peppercontribution;
+    if(human.pastChoices[currentRound-1] == "indiv"){
+        humancontribution = 0;
+    }else{
+        humancontribution = human.tempCoinsFound;
+    }
+    if(pepperBehaviour[currentRound-1].decision == "indiv"){
+        console.log("in pepper indiv");
+        peppercontribution = 0;
+    }else{
+        console.log("in pepper not indiv else");
+        peppercontribution = pepperBehaviour[currentRound-1].coins;
+    }
+    table.innerHTML = "<table><tr><td>2</td><td>x</td><td style='border-bottom: 1px;'>" + peppercontribution +"</td><td>x</td><td style='border-bottom: 1px;'>" + humancontribution +"</td><td>=</td><td>"+ roundTeamScore +"</td></tr><tr><td></td><td></td><td>Pepper's contribution</td><td></td><td>Your contribution</td><td></td><td>Team round score</td></tr></table>";
+    allScores.appendChild(table);
+
+    //tous les scores actuels (jeu en général, pas juste round)
+    var endRoundNewScores = document.createElement("div");
+    var allScoresTxt = "</br><p>Your current individual score: " + human.indivScore +"; Pepper's current individual score: "+ pepperIndivScore+ "; current team score: " + teamScore +".</p>"; 
+    endRoundNewScores.innerHTML = allScoresTxt;
+    allScores.appendChild(endRoundNewScores);
+    
+    container.appendChild(allScores);
+
+    var nextButton = document.createElement("button");
+    nextButton.innerHTML= "Next";
+    nextButton.setAttribute("onclick","gotoEORQuestion()");
+    container.appendChild(nextButton);
+
+    //TODO: will need to add Pepper's message
+}
+
+function gotoEORQuestion(){
+    var container = document.getElementById("main_container");
+    container.innerHTML="";
+
+    var question = document.createElement("div");
+    question.innerHTML = "<p>How much trust do you have in Pepper's performance and honesty?</p></br><button class='EORbutton' onclick='submitEORQuestion1()'>1 - Not at all</button><button class='EORbutton' onclick='submitEORQuestion2()'>2</button><button class='EORbutton' onclick='submitEORQuestion3()'>3</button><button class='EORbutton' onclick='submitEORQuestion4()'>4 - Moderately</button><button class='EORbutton' onclick='submitEORQuestion5()'>5</button><button class='EORbutton' onclick='submitEORQuestion6()'>6</button><button class='EORbutton' onclick='submitEORQuestion7()'>7 - Completely</button>";
+    container.appendChild(question);
+}
+
+function submitEORQuestion1(){
+    EORquestions.push(1);
+    console.log("one");
+    nextRound();
+}
+function submitEORQuestion2(){
+    EORquestions.push(2);
+    console.log("two");
+    nextRound();
+}
+function submitEORQuestion3(){
+    EORquestions.push(3);
+    console.log("three");
+    nextRound();
+}
+function submitEORQuestion4(){
+    EORquestions.push(4);
+    console.log("four");
+    nextRound();
+}
+function submitEORQuestion5(){
+    EORquestions.push(5);
+    console.log("five");
+    nextRound();
+}
+function submitEORQuestion6(){
+    EORquestions.push(6);
+    console.log("six");
+    nextRound();
+}
+function submitEORQuestion7(){
+    EORquestions.push(7);
+    console.log("seven");
+    nextRound();
+}
+
+function nextRound(){
+    if(currentRound==roundPerGame){
+        gotoEOGQuestion();
+    }else{
+        //reset for next round
+        human.tempCoinsFound = 0;
+        currentRound++;
+        console.log(human.indivScore +"; "+ pepperIndivScore+ "; " + teamScore);
+        init();
+    }
+}
+
+//EOG ===========================================================================================================
+function gotoEOGQuestion(){
+    var container = document.getElementById("main_container");
+    container.innerHTML="";
+
+    var question = document.createElement("div");
+    question.innerHTML = "<p>How willing are you to collaborate with Pepper again?</p></br><button class='EOGbutton' onclick='submitEOGQuestion1()'>1 - Not at all</button><button class='EOGbutton' onclick='submitEOGQuestion2()'>2</button><button class='EOGbutton' onclick='submitEOGQuestion3()'>3</button><button class='EOGbutton' onclick='submitEOGQuestion4()'>4 - Moderately</button><button class='EOGbutton' onclick='submitEOGQuestion5()'>5</button><button class='EOGbutton' onclick='submitEOGQuestion6()'>6</button><button class='EOGbutton' onclick='submitEOGQuestion7()'>7 - Completely</button>";
+    container.appendChild(question);
+}
+
+function submitEOGQuestion1(){
+    EOGquestions.push(1);
+    console.log("one");
+    endGame();
+}
+function submitEOGQuestion2(){
+    EOGquestions.push(2);
+    console.log("two");
+    endGame();
+}
+function submitEOGQuestion3(){
+    EOGquestions.push(3);
+    console.log("three");
+    endGame();
+}
+function submitEOGQuestion4(){
+    EOGquestions.push(4);
+    console.log("four");
+    endGame();
+}
+function submitEOGQuestion5(){
+    EOGquestions.push(5);
+    console.log("five");
+    endGame();
+}
+function submitEOGQuestion6(){
+    EOGquestions.push(6);
+    console.log("six");
+    endGame();
+}
+function submitEOGQuestion7(){
+    EOGquestions.push(7);
+    console.log("seven");
+    endGame();
+}
+
+function endGame(){
+    history.push([human.indivScore,teamScore,human.totalCoinsFound,human.pastChoices,EORquestions,EOGquestions[currentGame-1]]); //keeping everything in memory, will need to add type of Pepper failure
+
+    if(currentGame==gamePerExperiment){
+        theEnd();
+    }else{
+        //TODO: text saying need to go answer the questionnaire on the other computer, with a next button
+        var container = document.getElementById("main_container");
+        container.innerHTML="<div id='endGameTxt'>You finished the first game. Before pursuing to the second and last game, please move to the other computer and fill in the corresponding questionnaire. Once done, you can click on the button below.</div><button id='nextroundButton' onclick='nextGame()'>Next game</button>";
+    }
+}
+
+function nextGame(){
+    //reset everything for the next game
+    currentRound=1;
+    currentGame++;
+    human.tempCoinsFound = 0;
+    human.totalCoinsFound = 0;
+    human.pastChoices = [];
+    EORquestions = [];
+    teamScore = 0;
+    pepperIndivScore = 0;
+    human.indivScore = 0;
+
+    //next game started
+    init();
+}
+
+function theEnd(){
+    //TODO: keeping all the data somewhere
+    //TODO: final txt ; add instruction to go back to questionnaire + remind everything that happened?
+    var container = document.getElementById("main_container");
+    container.innerHTML="the end";
+}
 
 //HUMAN CONTROLS ON KEYBOARD ===================================================================================
 function eventKeyHandlers(e) {
@@ -545,6 +695,23 @@ function eventKeyHandlers(e) {
 
 
 //TOOLBOX ==================================================================================
-function randomIndex(max){//returns an int between one and max included
-    return Math.floor(Math.random() * max) + 1;
+function randomIndex(max){//returns an int between zero and max included
+    return Math.floor(Math.random() * max);
+}
+
+function randomID(x, repeatWord){
+    //generate a random id formed by x random words within dbIDWords
+    let randId = "";
+    let index;
+
+    for(i=0; i<x; i++){
+        index = randomIndex(dbIDWords.length);
+        randId += dbIDWords[index] + " ";
+
+        if(repeatWord == "false"){
+            dbIDWords.splice(index,1);
+        }
+    }
+
+    return randId;
 }
