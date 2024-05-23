@@ -1,8 +1,8 @@
-// const mazeWidth = 26;
-// const mazeHeight = 18;
-// const nbCoins = 15;
+const mazeWidth = 26;
+const mazeHeight = 18;
+const nbCoins = 15;
 const roundPerGame = 2;
-const gamePerExperiment = 2;
+const gamePerExperiment = 1;
 
 const strats = ["apology", "denial", "compensation"]; //one of those is chosen just once
 let failures = ["morality","performance"]; //one is chosen for the first game, the other for the second game. Random order
@@ -31,7 +31,7 @@ const maps = [
 const spawnPos = {"row" : 10, "col" : 14};
 let mapsOrder = shuffleArray(maps);
 let mapsIndex = 0;
-console.log(mapsOrder);
+// console.log(mapsOrder);
 
 
 const dbIDWords = ["apple", "avocado", "basil", "berry", "biscuit", "brownie", "caramel", "cheese", "crepe", "coffee", "chicken", "dinner", "drink", "egg", "food", "freezer", "fish", "granola", "grape", "honey", "jelly", "kiwi", "kettle", "lunch", "lettuce", "melon", "milk", "nectar", "olive", "oven", "oyster", "pasta", "plate", "potato", "popcorn", "pumpkin", "radish", "rice", "recipe", "raisin", "salmon", "spicy", "soda", "sugar", "tea", "vanilla", "vinegar", "waffle", "yam", "water"];
@@ -84,12 +84,12 @@ class Player {
 	}
 
     spawn(){ 
-        //if random maze and random spawn
+        //if random maze and random spawn ========
         // this.x = randomIndex(mazeWidth) +1;
         // this.y = randomIndex(mazeHeight) +1;
         // console.log("from human.spawn: cell_" + this.y + "_" + this.x);
 
-        //if not random spawn
+        //if not random spawn ==========
         this.x = spawnPos["col"];
         this.y = spawnPos["row"];
 
@@ -158,7 +158,7 @@ var human = new Player(1,1);
 
 
 //EVENT LISTENERS ================================================================================
-window.addEventListener("load", launchRound); //startExperiment
+window.addEventListener("load", startExperiment); //startExperiment
 document.addEventListener("keydown", eventKeyHandlers);
 
 //WELCOME PAGE ETC =========================================================================================
@@ -223,7 +223,7 @@ function launchRound(){
     // addCoins();
     
     human.spawn();
-    // startTimer();
+    startTimer();
 }
 
 //VARIOUS MAZE CREATIONS FUNCTIONS (only used if random maze) ===============================================================
@@ -474,13 +474,12 @@ function stopTimer(){
 }
 
 //EOR (SCORES, QUESTIONS...) =============================================================
-function endOfRound(){
+function endOfRound(){ //corr
     var center = document.getElementById("maze_container");
    
     center.style.backgroundColor = '#000000';
     center.style.alignContent = 'center';
-    center.innerHTML = "<div style='color:white;font-size: 20px; line-height: 30px; letter-spacing: 0px; padding: 0 10px;'><p>You won " + human.tempCoinsFound + " coin(s) this round. You can now choose to add this amount to your team score or to your individual score.<p></br><button id='addTeam' class='choiceButton' onclick='addTeamScore()' class='smallButton'>Add to Team Score</button> <button id='addIndiv' class='choiceButton' onclick='addIndivScore()' class='smallButton'>Add to Individual Score</button></div>";
-    //TODO: add the message to remind the calculation? Need to check timea's
+    center.innerHTML = "<div style='color:white;font-size: 20px; line-height: 30px; letter-spacing: 0px; padding: 0 10px;'><p>You collected " + human.tempCoinsFound + " coin(s).<p></br><button id='addTeam' class='choiceButton' onclick='addTeamScore()' class='smallButton'>Add to Team Score</button> <button id='addIndiv' class='choiceButton' onclick='addIndivScore()' class='smallButton'>Add to Individual Score</button></div>";
 }
 
 function addTeamScore(){ //if human chooses team
@@ -699,7 +698,7 @@ function submitEOGQuestion(){
     if(rep == "."){
         alert("You need to give an answer.");
     }else{
-        EOGquestionsRep.push([currentRound, rep]);
+        EOGquestionsRep.push([currentGame, rep]);
         console.log(rep);
         endGame();
     }
@@ -756,10 +755,23 @@ function nextGame(){
 }
 
 function theEnd(){
-    //TODO: keeping all the data somewhere
     //TODO: final txt ; add instruction to go back to questionnaire + remind everything that happened?
+
+    //downloading all data on the computer
+    let data = `${participantID}, ${stratType}, ${history}`; //TODO: ajouter tuto questions once tuto implemented
+    downloadData(data, `${participantID}.txt`);
+
     var container = document.getElementById("main_container");
     container.innerHTML="<div class='bigBlock'>the end</div>";
+}
+
+function downloadData(data, name){//data and name are string
+    const link = document.createElement("a");
+    const file = new Blob([data], {type: 'text/plain'});
+    link.href = URL.createObjectURL(file);
+    link.download = name;
+    link.click();
+    URL.revokeObjectURL(link.href);
 }
 
 //HUMAN CONTROLS ON KEYBOARD ===================================================================================
