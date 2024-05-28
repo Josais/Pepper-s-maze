@@ -1,0 +1,85 @@
+This is the playground. [Green] cells represents coins. You are the [blue] cell. 
+[picture of screen with box around the maze]
+
+You can move around the maze by pressing those buttons on the screen.
+[screen with boxes around the buttons]
+
+There are three additional pieces of data on the round screen: the number of coins you collected this round, which round you are playing in the game, and the timer.
+[screen with box around top of the page]
+
+Let's try to move and collect coins! [Let's go! button]
+[go to very short round with only like, 10 seconds. Or it stops once the participant has collected one coin?]
+
+Well done!
+
+In this search game, you will not be alone. You will be playing alongside an autonomous robot. The robot will move independantly in a different maze, and will gain its own score in each round, which will be separeted from yours. You cannot see the robot, nor can you control its movements. You can only decide whether to collaborate or not with it. [picture of Pepper with a hi speeking bubble?]
+
+There are two different types of scores in this game: the team score, and the individual score. Thoses scores are contradictory, meaning you cannot gain both team score and individual score at the same time.
+
+At the end of each round, you and the robot will make a trust decision. You will choose between collaborating with the robot and integrating your round score to the team score, or not collaborating and keeping your round score to your individual scores.
+[picture of choice screen?]
+
+The robot will make its own trust decision at the same time as you. Both you and the robot must make your trust decisions before seeing each other's score and trust decision for the round.
+
+Who will be your teammate in this game?
+    - A human. I can see and control their movement during the game
+    - A human. I cannot see and control their movement during the game
+    - A robot. I can see and control their movement during the game
+    - A robot. I cannot see and control their movement during the game
+
+Can you see the score and the trust decision of your teammate before making your trust decision?
+    - Yes, I can see the robot score and trust decision and based on that I can make my trust decision
+    - No, I cannot see the robot score and trust decision before I make my trust decision
+
+Once the trust decisions are made, there are three possibles scenarios: you both chose to add to the team score, you both chose to add to your respective individual scores, or one of you chose to add to the team score and the other chose to add to their own individual score. 
+
+<h1>Scenario 1: you both choose to add to the team score.
+You will gain a team score that is calculated by multiplying your round score, with the robot's round score, and then multiplying the result by two. 
+Example: if you collect 3 coins and the robot collects 4, and you both add to the team score, then the team score for this round will be 3 by 4 by 2 = 24. 24 points will be added to the team score, while 0 point will be added to both yours and the robot's individual scores.
+
+<h1>Scenario 2: you both choose to add to your individual scores.
+Your unchanged round scores will be added to your respective individual scores. 
+Example: if you collected 3 coins in a round and the robot has collected 4, and both of you add to the individual scores, then 3 points will be added to your individual score, 4 points will be added to the robot's individual score, and 0 point will be added to the team score.
+
+<h1>Scenario 3: one of you chose to add to the team score and the other chose to add to their own individual score.
+No team score will be gained and the one who decided to integrate to the team score will gain zero point. 
+Example: if you collect 3 coins in a round, the robot collects 4, and you decide to add to your individual score but the robot decide to add to the team score, then 3 points will be added to your individual score, while 0 point will be added to the team score and the robot's individual score.
+
+Based on this scoring mechanisms, you can earn an added bonus of 1 euro for each round where the team score surpasses [] points. Alternatively, you can earn an added bonus of 25 cents for each round where your individual score surpasses [] points. So consider your strategy carefully and decide whether you would like to work toward maximizing your individual score or the team score and potentially gaining an added bonus.
+
+[should I add training in choosing or not? might be too long, will need to check with available time]
+
+What will your individual and team scores be if you pick 2 targets, and your teammate picks 3 targets in one round of the game and you both add to the team score?
+    - Team score: 5, Human individual score: 2, Robot individual score: 3
+    - Team score: 6, Human individual score: 2, Robot individual score: 3
+    - Team score: 0, Human individual score: 2, Robot individual score: 3
+    - Team score: 12, Human individual score: 2, Robot individual score: 3
+    - Team score: 6, Human individual score: 0, Robot individual score: 0
+    - Team score: 5, Human individual score: 0, Robot individual score: 0
+    - Team score: 12, Human individual score: 0, Robot individual score: 0
+    - Team score: 0, Human individual score: 0, Robot individual score: 3
+    - Team score: 0, Human individual score: 2, Robot individual score: 0
+
+What will your individual and team scores be if you pick 2 targets and your teammate picks 3 targets in one round of the game and you both add to the individual score?
+    - Team score: 5, Human individual score: 2, Robot individual score: 3
+    - Team score: 6, Human individual score: 2, Robot individual score: 3
+    - Team score: 0, Human individual score: 2, Robot individual score: 3
+    - Team score: 12, Human individual score: 2, Robot individual score: 3
+    - Team score: 6, Human individual score: 0, Robot individual score: 0
+    - Team score: 5, Human individual score: 0, Robot individual score: 0
+    - Team score: 12, Human individual score: 0, Robot individual score: 0
+    - Team score: 0, Human individual score: 0, Robot individual score: 3
+    - Team score: 0, Human individual score: 2, Robot individual score: 0
+
+What will your individual and team scores be if you pick 2 targets, and your teammate picks 3 targets in one round of the game and you add to the individual score and your teammate adds to the team score?
+    - Team score: 5, Human individual score: 2, Robot individual score: 3
+    - Team score: 6, Human individual score: 2, Robot individual score: 3
+    - Team score: 0, Human individual score: 2, Robot individual score: 3
+    - Team score: 12, Human individual score: 2, Robot individual score: 3
+    - Team score: 6, Human individual score: 0, Robot individual score: 0
+    - Team score: 5, Human individual score: 0, Robot individual score: 0
+    - Team score: 12, Human individual score: 0, Robot individual score: 0
+    - Team score: 0, Human individual score: 0, Robot individual score: 3
+    - Team score: 0, Human individual score: 2, Robot individual score: 0
+
+Congratulations! You finished the tutorial. Do you wish to play the main game or replay the tutorial?

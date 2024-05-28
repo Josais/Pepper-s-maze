@@ -1,8 +1,10 @@
 const mazeWidth = 26;
 const mazeHeight = 18;
 const nbCoins = 15;
-const roundPerGame = 2;
-const gamePerExperiment = 1;
+const roundPerGame = 1;
+const gamePerExperiment = 2;
+
+let tutorialMode;
 
 const strats = ["apology", "denial", "compensation"]; //one of those is chosen just once
 let failures = ["morality","performance"]; //one is chosen for the first game, the other for the second game. Random order
@@ -58,7 +60,7 @@ const pepperBehaviourMorality=[
 let pepperBehaviour;
 
 let timer;
-const ms = 0, sec = 30, min = 0; //fixes timer length for each round
+const ms = 0, sec = 5, min = 0; //fixes timer length for each round
 let millis, secs, minu;
 
 let humanCell;
@@ -138,9 +140,14 @@ class Player {
     }
 
     pickCoin(){
-        this.tempCoinsFound++;
-        humanCell.setAttribute("isCoin", "false");
-        document.getElementById("tempScore_container").innerHTML = "Coins collected this round = " + this.tempCoinsFound.toString();
+        if(tutorialMode){ //in the tutorial, collecting one coin is the end of the round; calls to the next step of the tutorial
+            console.log("in pickcoin tuto true" + tutorialMode);
+            tutorial4();
+        }else{
+            this.tempCoinsFound++;
+            humanCell.setAttribute("isCoin", "false");
+            document.getElementById("tempScore_container").innerHTML = "Coins collected this round = " + this.tempCoinsFound.toString();
+        }
     }
 
     updateIndivScore(choice){
@@ -158,20 +165,25 @@ var human = new Player(1,1);
 
 
 //EVENT LISTENERS ================================================================================
-window.addEventListener("load", startExperiment); //startExperiment
+window.addEventListener("load", startExperiment);
 document.addEventListener("keydown", eventKeyHandlers);
+
+
 
 //WELCOME PAGE ETC =========================================================================================
 function startExperiment(){ 
-    //TODO: need to add tutorial
-    console.log(participantID);
+    console.log("in start experiment partid: " + participantID);
+    tutorialMode = false;
+    console.log("in start experiment: "+tutorialMode);
 
     var container = document.getElementById("main_container");
-    container.innerHTML="<div class='row2'><h1>Welcome!</h1></div><div class='row3'>You are going to play two short games with Pepper. They consist in exploring a maze and collecting coins. Although you will not be able to see what Pepper is doing, and Pepper will not have accessed to what you are doing, you will be working towards a same goal: maximizing your team score. <br> Before starting the tutorial, please insert the four-word anonymized ID in the survey.</br></br><div id='participantID'></div></div><div style='grid-area: 4 / 2 / 5 / 3;'><button id='tutorial'>Tutorial</button></div><div style='grid-area: 4 / 4 / 5 / 5;'><button id='launchGame' onclick='init()'>Launch Game</button></div>"; //init function for launchgame
+    container.innerHTML="<div class='row2'><h1>Welcome!</h1></div><div class='row3'>You are going to play two short games with Pepper. They consist in exploring a maze and collecting coins. Although you will not be able to see what Pepper is doing, and Pepper will not have accessed to what you are doing, you will be working towards a same goal: maximizing your team score. <br> Before starting the tutorial, please insert the four-word anonymized ID in the survey.</br></br><div id='participantID'></div></div><div style='grid-area: 4 / 2 / 5 / 3;'><button id='tutorial' onclick='tutorial1()'>Tutorial</button></div><div style='grid-area: 4 / 4 / 5 / 5;'><button id='launchGame' onclick='init()'>Launch Game</button></div>"; //init function for launchgame
 
     var participant = document.getElementById("participantID");
     participant.innerHTML = participantID;
     participant.style.border = "1px #FFFFFF solid";
+
+    console.log("deuxième part id: " +participantID);
 }
 
 function init() {
@@ -598,78 +610,206 @@ function gotoEORQuestions2(){
 
 function gotoEORQuestionPerf(){
     var container = document.getElementById("main_container");
-    container.innerHTML= "<div class='row2'>How much trust do you have in Pepper's performance?</div><div style='grid-area:3/1/4/6; text-align: center;'>Not at all  <button class='EORbutton' onclick='submitEORQuestionPerf1()'>1</button><button class='EORbutton' onclick='submitEORQuestionPerf2()'>2</button><button class='EORbutton' onclick='submitEORQuestionPerf3()'>3</button><button class='EORbutton' onclick='submitEORQuestionPerf4()'>4</button><button class='EORbutton' onclick='submitEORQuestionPerf5()'>5</button><button class='EORbutton' onclick='submitEORQuestionPerf6()'>6</button><button class='EORbutton' onclick='submitEORQuestionPerf7()'>7</button> Completely</div> <div class='row4' id='perfRepConfirm'>You chose <span id='perfRep'>.</span></br></br> <button class='sendRepButton' onclick='submitEORQuestionPerf()'>Confirm</button></div>";
+    container.innerHTML= "<div class='row2'>How much trust do you have in Pepper's performance?</div><div style='grid-area:3/1/4/6; text-align: center;'>Not at all  <button id='b1_perf' class='EORbutton' onclick='repPerf1()'>1</button><button id='b2_perf' class='EORbutton' onclick='repPerf2()'>2</button><button id='b3_perf' class='EORbutton' onclick='repPerf3()'>3</button><button id='b4_perf' class='EORbutton' onclick='repPerf4()'>4</button><button id='b5_perf' class='EORbutton' onclick='repPerf5()'>5</button><button id='b6_perf' class='EORbutton' onclick='repPerf6()'>6</button><button id='b7_perf' class='EORbutton' onclick='repPerf7()'>7</button> Completely</div></br></br> <div style='grid-area:4/2/5/5;'><button id='bConfirm_perf' class='sendRepButton'>Confirm</button></div></div>";
 }
 
-function submitEORQuestionPerf(){
-    let rep = document.getElementById("perfRep").innerHTML;
-    if(rep == "."){
-        alert("You need to give an answer.");
-    }else{
-        EORquestionsRep.push([currentRound, "perf", rep]);
-        console.log(rep);
-        gotoEORQuestions2();
-    }
+function submitRepPerf(rating){
+    EORquestionsRep.push([currentRound, "perf", rating]);
+    console.log(rating);
+    gotoEORQuestions2();
 }
 
-function submitEORQuestionPerf1(){
-    document.getElementById("perfRep").innerHTML = "1";
+function repPerf1(){
+    document.getElementById("b1_perf").style.backgroundColor = "#ff0000";
+
+    document.getElementById("b2_perf").style.backgroundColor = "#222222";
+    document.getElementById("b3_perf").style.backgroundColor = "#222222";
+    document.getElementById("b4_perf").style.backgroundColor = "#222222";
+    document.getElementById("b5_perf").style.backgroundColor = "#222222";
+    document.getElementById("b6_perf").style.backgroundColor = "#222222";
+    document.getElementById("b7_perf").style.backgroundColor = "#222222";
+
+    document.getElementById("bConfirm_perf").setAttribute("onclick", "submitRepPerf(1)");
 }
-function submitEORQuestionPerf2(){
-    document.getElementById("perfRep").innerHTML = "2";
+
+function repPerf2(){
+    document.getElementById("b2_perf").style.backgroundColor = "#ff0000";
+
+    document.getElementById("b1_perf").style.backgroundColor = "#222222";
+    document.getElementById("b3_perf").style.backgroundColor = "#222222";
+    document.getElementById("b4_perf").style.backgroundColor = "#222222";
+    document.getElementById("b5_perf").style.backgroundColor = "#222222";
+    document.getElementById("b6_perf").style.backgroundColor = "#222222";
+    document.getElementById("b7_perf").style.backgroundColor = "#222222";
+
+    document.getElementById("bConfirm_perf").setAttribute("onclick", "submitRepPerf(2)");
 }
-function submitEORQuestionPerf3(){
-    document.getElementById("perfRep").innerHTML = "3";
+
+function repPerf3(){
+    document.getElementById("b3_perf").style.backgroundColor = "#ff0000";
+
+    document.getElementById("b2_perf").style.backgroundColor = "#222222";
+    document.getElementById("b1_perf").style.backgroundColor = "#222222";
+    document.getElementById("b4_perf").style.backgroundColor = "#222222";
+    document.getElementById("b5_perf").style.backgroundColor = "#222222";
+    document.getElementById("b6_perf").style.backgroundColor = "#222222";
+    document.getElementById("b7_perf").style.backgroundColor = "#222222";
+
+    document.getElementById("bConfirm_perf").setAttribute("onclick", "submitRepPerf(3)");
 }
-function submitEORQuestionPerf4(){
-    document.getElementById("perfRep").innerHTML = "4";
+
+function repPerf4(){
+    document.getElementById("b4_perf").style.backgroundColor = "#ff0000";
+
+    document.getElementById("b2_perf").style.backgroundColor = "#222222";
+    document.getElementById("b3_perf").style.backgroundColor = "#222222";
+    document.getElementById("b1_perf").style.backgroundColor = "#222222";
+    document.getElementById("b5_perf").style.backgroundColor = "#222222";
+    document.getElementById("b6_perf").style.backgroundColor = "#222222";
+    document.getElementById("b7_perf").style.backgroundColor = "#222222";
+
+    document.getElementById("bConfirm_perf").setAttribute("onclick", "submitRepPerf(4)");
 }
-function submitEORQuestionPerf5(){
-    document.getElementById("perfRep").innerHTML = "5";
+
+function repPerf5(){
+    document.getElementById("b5_perf").style.backgroundColor = "#ff0000";
+
+    document.getElementById("b2_perf").style.backgroundColor = "#222222";
+    document.getElementById("b3_perf").style.backgroundColor = "#222222";
+    document.getElementById("b4_perf").style.backgroundColor = "#222222";
+    document.getElementById("b1_perf").style.backgroundColor = "#222222";
+    document.getElementById("b6_perf").style.backgroundColor = "#222222";
+    document.getElementById("b7_perf").style.backgroundColor = "#222222";
+
+    document.getElementById("bConfirm_perf").setAttribute("onclick", "submitRepPerf(5)");
 }
-function submitEORQuestionPerf6(){
-    document.getElementById("perfRep").innerHTML = "6";
+
+function repPerf6(){
+    document.getElementById("b6_perf").style.backgroundColor = "#ff0000";
+
+    document.getElementById("b2_perf").style.backgroundColor = "#222222";
+    document.getElementById("b3_perf").style.backgroundColor = "#222222";
+    document.getElementById("b4_perf").style.backgroundColor = "#222222";
+    document.getElementById("b5_perf").style.backgroundColor = "#222222";
+    document.getElementById("b1_perf").style.backgroundColor = "#222222";
+    document.getElementById("b7_perf").style.backgroundColor = "#222222";
+
+    document.getElementById("bConfirm_perf").setAttribute("onclick", "submitRepPerf(6)");
 }
-function submitEORQuestionPerf7(){
-    document.getElementById("perfRep").innerHTML = "7";
+
+function repPerf7(){
+    document.getElementById("b7_perf").style.backgroundColor = "#ff0000";
+
+    document.getElementById("b2_perf").style.backgroundColor = "#222222";
+    document.getElementById("b3_perf").style.backgroundColor = "#222222";
+    document.getElementById("b4_perf").style.backgroundColor = "#222222";
+    document.getElementById("b5_perf").style.backgroundColor = "#222222";
+    document.getElementById("b6_perf").style.backgroundColor = "#222222";
+    document.getElementById("b1_perf").style.backgroundColor = "#222222";
+
+    document.getElementById("bConfirm_perf").setAttribute("onclick", "submitRepPerf(7)");
 }
 
 function gotoEORQuestionHonesty(){
     var container = document.getElementById("main_container");
-    container.innerHTML= "<div class='row2'>How much trust do you have in Pepper's honesty?</div><div style='grid-area:3/1/4/6; text-align: center;'>Not at all  <button class='EORbutton' onclick='submitEORQuestionHonesty1()'>1</button><button class='EORbutton' onclick='submitEORQuestionHonesty2()'>2</button><button class='EORbutton' onclick='submitEORQuestionHonesty3()'>3</button><button class='EORbutton' onclick='submitEORQuestionHonesty4()'>4</button><button class='EORbutton' onclick='submitEORQuestionHonesty5()'>5</button><button class='EORbutton' onclick='submitEORQuestionHonesty6()'>6</button><button class='EORbutton' onclick='submitEORQuestionHonesty7()'>7</button> Completely</div> <div class='row4' id='honestyRepConfirm'>You chose <span id='honestyRep'>.</span></br></br> <button class='sendRepButton' onclick='submitEORQuestionHonesty()'>Confirm</button></div>";
+    container.innerHTML= "<div class='row2'>How much trust do you have in Pepper's honesty?</div><div style='grid-area:3/1/4/6; text-align: center;'>Not at all  <button id='b1_honesty' class='EORbutton' onclick='repHonesty1()'>1</button><button id='b2_honesty' class='EORbutton' onclick='repHonesty2()'>2</button><button id='b3_honesty' class='EORbutton' onclick='repHonesty3()'>3</button><button id='b4_honesty' class='EORbutton' onclick='repHonesty4()'>4</button><button id='b5_honesty' class='EORbutton' onclick='repHonesty5()'>5</button><button id='b6_honesty' class='EORbutton' onclick='repHonesty6()'>6</button><button id='b7_honesty' class='EORbutton' onclick='repHonesty7()'>7</button> Completely</div></br></br> <div style='grid-area:4/2/5/5;'><button id='bConfirm_honesty' class='sendRepButton'>Confirm</button></div></div>";
 }
 
-function submitEORQuestionHonesty(){
-    let rep = document.getElementById("honestyRep").innerHTML;
-    if(rep == "."){
-        alert("You need to give an answer.");
-    }else{
-        EORquestionsRep.push([currentRound, "honesty", rep]);
-        console.log(rep);
-        gotoEORQuestions2();
-    }
+function submitRepHonesty(rating){
+    EORquestionsRep.push([currentRound, "honesty", rating]);
+    console.log(rating);
+    gotoEORQuestions2();
 }
 
-function submitEORQuestionHonesty1(){
-    document.getElementById("honestyRep").innerHTML = "1";
+function repHonesty1(){
+    document.getElementById("b1_honesty").style.backgroundColor = "#ff0000";
+
+    document.getElementById("b2_honesty").style.backgroundColor = "#222222";
+    document.getElementById("b3_honesty").style.backgroundColor = "#222222";
+    document.getElementById("b4_honesty").style.backgroundColor = "#222222";
+    document.getElementById("b5_honesty").style.backgroundColor = "#222222";
+    document.getElementById("b6_honesty").style.backgroundColor = "#222222";
+    document.getElementById("b7_honesty").style.backgroundColor = "#222222";
+
+    document.getElementById("bConfirm_honesty").setAttribute("onclick", "submitRepHonesty(1)");
 }
-function submitEORQuestionHonesty2(){
-    document.getElementById("honestyRep").innerHTML = "2";
+
+function repHonesty2(){
+    document.getElementById("b2_honesty").style.backgroundColor = "#ff0000";
+
+    document.getElementById("b1_honesty").style.backgroundColor = "#222222";
+    document.getElementById("b3_honesty").style.backgroundColor = "#222222";
+    document.getElementById("b4_honesty").style.backgroundColor = "#222222";
+    document.getElementById("b5_honesty").style.backgroundColor = "#222222";
+    document.getElementById("b6_honesty").style.backgroundColor = "#222222";
+    document.getElementById("b7_honesty").style.backgroundColor = "#222222";
+
+    document.getElementById("bConfirm_honesty").setAttribute("onclick", "submitRepHonesty(2)");
 }
-function submitEORQuestionHonesty3(){
-    document.getElementById("honestyRep").innerHTML = "3";
+
+function repHonesty3(){
+    document.getElementById("b3_honesty").style.backgroundColor = "#ff0000";
+
+    document.getElementById("b2_honesty").style.backgroundColor = "#222222";
+    document.getElementById("b1_honesty").style.backgroundColor = "#222222";
+    document.getElementById("b4_honesty").style.backgroundColor = "#222222";
+    document.getElementById("b5_honesty").style.backgroundColor = "#222222";
+    document.getElementById("b6_honesty").style.backgroundColor = "#222222";
+    document.getElementById("b7_honesty").style.backgroundColor = "#222222";
+
+    document.getElementById("bConfirm_honesty").setAttribute("onclick", "submitRepHonesty(3)");
 }
-function submitEORQuestionHonesty4(){
-    document.getElementById("honestyRep").innerHTML = "4";
+
+function repHonesty4(){
+    document.getElementById("b4_honesty").style.backgroundColor = "#ff0000";
+
+    document.getElementById("b2_honesty").style.backgroundColor = "#222222";
+    document.getElementById("b3_honesty").style.backgroundColor = "#222222";
+    document.getElementById("b1_honesty").style.backgroundColor = "#222222";
+    document.getElementById("b5_honesty").style.backgroundColor = "#222222";
+    document.getElementById("b6_honesty").style.backgroundColor = "#222222";
+    document.getElementById("b7_honesty").style.backgroundColor = "#222222";
+
+    document.getElementById("bConfirm_honesty").setAttribute("onclick", "submitRepHonesty(4)");
 }
-function submitEORQuestionHonesty5(){
-    document.getElementById("honestyRep").innerHTML = "5";
+
+function repHonesty5(){
+    document.getElementById("b5_honesty").style.backgroundColor = "#ff0000";
+
+    document.getElementById("b2_honesty").style.backgroundColor = "#222222";
+    document.getElementById("b3_honesty").style.backgroundColor = "#222222";
+    document.getElementById("b4_honesty").style.backgroundColor = "#222222";
+    document.getElementById("b1_honesty").style.backgroundColor = "#222222";
+    document.getElementById("b6_honesty").style.backgroundColor = "#222222";
+    document.getElementById("b7_honesty").style.backgroundColor = "#222222";
+
+    document.getElementById("bConfirm_honesty").setAttribute("onclick", "submitRepHonesty(5)");
 }
-function submitEORQuestionHonesty6(){
-    document.getElementById("honestyRep").innerHTML = "6";
+
+function repHonesty6(){
+    document.getElementById("b6_honesty").style.backgroundColor = "#ff0000";
+
+    document.getElementById("b2_honesty").style.backgroundColor = "#222222";
+    document.getElementById("b3_honesty").style.backgroundColor = "#222222";
+    document.getElementById("b4_honesty").style.backgroundColor = "#222222";
+    document.getElementById("b5_honesty").style.backgroundColor = "#222222";
+    document.getElementById("b1_honesty").style.backgroundColor = "#222222";
+    document.getElementById("b7_honesty").style.backgroundColor = "#222222";
+
+    document.getElementById("bConfirm_honesty").setAttribute("onclick", "submitRepHonesty(6)");
 }
-function submitEORQuestionHonesty7(){
-    document.getElementById("honestyRep").innerHTML = "7";
+
+function repHonesty7(){
+    document.getElementById("b7_honesty").style.backgroundColor = "#ff0000";
+
+    document.getElementById("b2_honesty").style.backgroundColor = "#222222";
+    document.getElementById("b3_honesty").style.backgroundColor = "#222222";
+    document.getElementById("b4_honesty").style.backgroundColor = "#222222";
+    document.getElementById("b5_honesty").style.backgroundColor = "#222222";
+    document.getElementById("b6_honesty").style.backgroundColor = "#222222";
+    document.getElementById("b1_honesty").style.backgroundColor = "#222222";
+
+    document.getElementById("bConfirm_honesty").setAttribute("onclick", "submitRepHonesty(7)");
 }
 
 function nextRound(){
@@ -690,40 +830,104 @@ function nextRound(){
 //EOG ===========================================================================================================
 function gotoEOGQuestion(){
     var container = document.getElementById("main_container");
-    container.innerHTML = "<div class='row2'>How willing are you to collaborate with Pepper again?</div><div style='grid-area:3/1/4/6; text-align: center;'>Not at all  <button class='EOGbutton' onclick='submitEOGQuestion1()'>1</button><button class='EOGbutton' onclick='submitEOGQuestion2()'>2</button><button class='EOGbutton' onclick='submitEOGQuestion3()'>3</button><button class='EOGbutton' onclick='submitEOGQuestion4()'>4</button><button class='EOGbutton' onclick='submitEOGQuestion5()'>5</button><button class='EOGbutton' onclick='submitEOGQuestion6()'>6</button><button class='EOGbutton' onclick='submitEOGQuestion7()'>7</button> Completely</div><div class='row4' id='EOGquestionConfirm'>You chose <span id='EOGRep'>.</span></br></br> <button class='sendRepButton' onclick='submitEOGQuestion()'>Confirm</button></div>";
+    container.innerHTML = "<div class='row2'>How willing are you to collaborate with Pepper again?</div><div style='grid-area:3/1/4/6; text-align: center;'>Not at all  <button id='b1_EOG' class='EORbutton' onclick='repEOG1()'>1</button><button id='b2_EOG' class='EORbutton' onclick='repEOG2()'>2</button><button id='b3_EOG' class='EORbutton' onclick='repEOG3()'>3</button><button id='b4_EOG' class='EORbutton' onclick='repEOG4()'>4</button><button id='b5_EOG' class='EORbutton' onclick='repEOG5()'>5</button><button id='b6_EOG' class='EORbutton' onclick='repEOG6()'>6</button><button id='b7_EOG' class='EORbutton' onclick='repEOG7()'>7</button> Completely</div></br></br> <div style='grid-area:4/2/5/5;'><button id='bConfirm_EOG' class='sendRepButton'>Confirm</button></div></div>";
 }
 
-function submitEOGQuestion(){
-    let rep = document.getElementById("EOGRep").innerHTML;
-    if(rep == "."){
-        alert("You need to give an answer.");
-    }else{
-        EOGquestionsRep.push([currentGame, rep]);
-        console.log(rep);
-        endGame();
-    }
+function submitRepEOG(rating){
+    EOGquestionsRep.push([currentGame, rating]);
+    console.log(rating);
+    endGame();
 }
 
-function submitEOGQuestion1(){
-    document.getElementById("EOGRep").innerHTML = "1";
+function repEOG1(){
+    document.getElementById("b1_EOG").style.backgroundColor = "#ff0000";
+
+    document.getElementById("b2_EOG").style.backgroundColor = "#222222";
+    document.getElementById("b3_EOG").style.backgroundColor = "#222222";
+    document.getElementById("b4_EOG").style.backgroundColor = "#222222";
+    document.getElementById("b5_EOG").style.backgroundColor = "#222222";
+    document.getElementById("b6_EOG").style.backgroundColor = "#222222";
+    document.getElementById("b7_EOG").style.backgroundColor = "#222222";
+
+    document.getElementById("bConfirm_EOG").setAttribute("onclick", "submitRepEOG(1)");
 }
-function submitEOGQuestion2(){
-    document.getElementById("EOGRep").innerHTML = "2";
+
+function repEOG2(){
+    document.getElementById("b2_EOG").style.backgroundColor = "#ff0000";
+
+    document.getElementById("b1_EOG").style.backgroundColor = "#222222";
+    document.getElementById("b3_EOG").style.backgroundColor = "#222222";
+    document.getElementById("b4_EOG").style.backgroundColor = "#222222";
+    document.getElementById("b5_EOG").style.backgroundColor = "#222222";
+    document.getElementById("b6_EOG").style.backgroundColor = "#222222";
+    document.getElementById("b7_EOG").style.backgroundColor = "#222222";
+
+    document.getElementById("bConfirm_EOG").setAttribute("onclick", "submitRepEOG(2)");
 }
-function submitEOGQuestion3(){
-    document.getElementById("EOGRep").innerHTML = "3";
+
+function repEOG3(){
+    document.getElementById("b3_EOG").style.backgroundColor = "#ff0000";
+
+    document.getElementById("b2_EOG").style.backgroundColor = "#222222";
+    document.getElementById("b1_EOG").style.backgroundColor = "#222222";
+    document.getElementById("b4_EOG").style.backgroundColor = "#222222";
+    document.getElementById("b5_EOG").style.backgroundColor = "#222222";
+    document.getElementById("b6_EOG").style.backgroundColor = "#222222";
+    document.getElementById("b7_EOG").style.backgroundColor = "#222222";
+
+    document.getElementById("bConfirm_EOG").setAttribute("onclick", "submitRepEOG(3)");
 }
-function submitEOGQuestion4(){
-    document.getElementById("EOGRep").innerHTML = "4";
+
+function repEOG4(){
+    document.getElementById("b4_EOG").style.backgroundColor = "#ff0000";
+
+    document.getElementById("b2_EOG").style.backgroundColor = "#222222";
+    document.getElementById("b3_EOG").style.backgroundColor = "#222222";
+    document.getElementById("b1_EOG").style.backgroundColor = "#222222";
+    document.getElementById("b5_EOG").style.backgroundColor = "#222222";
+    document.getElementById("b6_EOG").style.backgroundColor = "#222222";
+    document.getElementById("b7_EOG").style.backgroundColor = "#222222";
+
+    document.getElementById("bConfirm_EOG").setAttribute("onclick", "submitRepEOG(4)");
 }
-function submitEOGQuestion5(){
-    document.getElementById("EOGRep").innerHTML = "5";
+
+function repEOG5(){
+    document.getElementById("b5_EOG").style.backgroundColor = "#ff0000";
+
+    document.getElementById("b2_EOG").style.backgroundColor = "#222222";
+    document.getElementById("b3_EOG").style.backgroundColor = "#222222";
+    document.getElementById("b4_EOG").style.backgroundColor = "#222222";
+    document.getElementById("b1_EOG").style.backgroundColor = "#222222";
+    document.getElementById("b6_EOG").style.backgroundColor = "#222222";
+    document.getElementById("b7_EOG").style.backgroundColor = "#222222";
+
+    document.getElementById("bConfirm_EOG").setAttribute("onclick", "submitRepEOG(5)");
 }
-function submitEOGQuestion6(){
-    document.getElementById("EOGRep").innerHTML = "6";
+
+function repEOG6(){
+    document.getElementById("b6_EOG").style.backgroundColor = "#ff0000";
+
+    document.getElementById("b2_EOG").style.backgroundColor = "#222222";
+    document.getElementById("b3_EOG").style.backgroundColor = "#222222";
+    document.getElementById("b4_EOG").style.backgroundColor = "#222222";
+    document.getElementById("b5_EOG").style.backgroundColor = "#222222";
+    document.getElementById("b1_EOG").style.backgroundColor = "#222222";
+    document.getElementById("b7_EOG").style.backgroundColor = "#222222";
+
+    document.getElementById("bConfirm_EOG").setAttribute("onclick", "submitRepEOG(6)");
 }
-function submitEOGQuestion7(){
-    document.getElementById("EOGRep").innerHTML = "7";
+
+function repEOG7(){
+    document.getElementById("b7_EOG").style.backgroundColor = "#ff0000";
+
+    document.getElementById("b2_EOG").style.backgroundColor = "#222222";
+    document.getElementById("b3_EOG").style.backgroundColor = "#222222";
+    document.getElementById("b4_EOG").style.backgroundColor = "#222222";
+    document.getElementById("b5_EOG").style.backgroundColor = "#222222";
+    document.getElementById("b6_EOG").style.backgroundColor = "#222222";
+    document.getElementById("b1_EOG").style.backgroundColor = "#222222";
+
+    document.getElementById("bConfirm_EOG").setAttribute("onclick", "submitRepEOG(7)");
 }
 
 function endGame(){

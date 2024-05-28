@@ -164,7 +164,6 @@ table {
 }
 
 div.col {
-
     width: 50px;
     height: 50px;
     display: inline-block;
@@ -172,7 +171,6 @@ div.col {
     outline: 1px #efefef dotted;
     margin: 0;
     padding: 0;
-    
 }
 
 button{
@@ -197,14 +195,7 @@ button{
     font-size: large;
 }
 
-.EORbutton{
-    width: 10%;
-    height: 80%;
-    text-align: center;
-    align-items: center;
-}
-
-.EOGbutton{
+.EORbutton, .EOGbutton{
     width: 10%;
     height: 80%;
     text-align: center;
@@ -214,6 +205,18 @@ button{
 .sendRepButton{
     width: 50%;
     height: 50%;
+}
+
+.nextButton{
+    width:auto;
+    height: auto;
+    padding: 20px;
+}
+
+.tutoQuestionButton{
+    height:50px;
+    width: 50px;
+    padding:10px;
 }
 
 #perfRep, #honestyRep, #EOGRep{
