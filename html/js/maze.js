@@ -176,7 +176,7 @@ document.addEventListener("keydown", eventKeyHandlers);
 // }
 
 //WELCOME PAGE ETC =========================================================================================
-function startExperiment(){ 
+function startExperiment(){ //TODO: better txt
     tutorialMode = false;
 
     var container = document.getElementById("main_container");
@@ -934,7 +934,7 @@ function endGame(){
 
     if(currentGame==gamePerExperiment){
         theEnd();
-    }else{
+    }else{ //TODO: modify layout, style; scores are too little (bc p probably)
         var container = document.getElementById("main_container");
         container.innerHTML=`<div id='endGameTxt' class='row2'>You finished the first game. The scores are as followed: <p>Your individual score: ${human.indivScore}</p><p>Pepper's individual score: ${pepperIndivScore}</p><p>Team score: ${teamScore} </p> </div> <div class = 'row3'>Before going to the second and last game, please move to the other computer and fill in the corresponding questionnaire. Once done, you can start the next game by clicking on the button below. </div><div class='row4'><button id='nextRoundButton' onclick='nextGame()' class='choiceButton'>Next game</button></div>`;
     }
