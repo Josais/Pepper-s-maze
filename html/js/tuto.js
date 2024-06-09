@@ -1,44 +1,57 @@
+// window.addEventListener("load", tutorial15);
+
 //TUTORIAL FUNCTIONS =========================================================================================
 function tutorial1(){
     tutorialMode = true;
     var container = document.getElementById("main_container");
-    container.innerHTML= "<div class='bigBlock'><div>This is the playground. Green cells represents coins. You are the blue cell. You can move around the maze by pressing those buttons on the screen.</div><img src=''>bouh</img> </br></br><button class='nextButton' onclick='tutorial2()'>Next</button></div>";
+    container.innerHTML= "<div class='bigBlock'><div>This is the <span style='color: #FF3131'>playground</span>. Yellow cells represents coins. You are the blue cell. You can move around the maze by pressing <span style='color: #00BF63'>those buttons</span> on the screen.</div><img src='img/maze.png' width='600px'></img> </br></br><button class='nextButton' onclick='tutorial2()'>Next</button></div>";
 }
 
 function tutorial2(){
     console.log("in tuto2: " +tutorialMode);
     var container = document.getElementById("main_container");
-    container.innerHTML= "<div class='bigBlock'><div>There are three additional pieces of data on the round screen: the number of coins you collected this round, which round you are playing in the game, and the timer.</div><img src=''>add img</img></br></br><button class='nextButton' onclick='tutorial2b()'>Let's go!</button></div>";
+    container.innerHTML= "<div class='bigBlock'><div>There are three additional pieces of data on the screen: <span style='color:#00BF63'>the number of coins you collected this round</span>, <span style='color:#38B6FF'>which round you are playing in the game</span>, and <span style='color:#FF3131'>the timer</span>.</div><img src='img/top_page.png' width='600px'></img></br></br><button class='nextButton' onclick='tutorial2b()'>Let's go!</button></div>";
 }
 
 function tutorial2b(){
     var container = document.getElementById("main_container");
-    container.innerHTML= "<div class='bigBlock'><div>You will be moved to a very short round of the searching game. You will be able to try to move around the maze. The round will stop as soon as you have collected your first coin.</div></br></br><button class='nextButton' onclick='tutorial3()'>Let's go!</button></div>";
+    container.innerHTML= "<div class='bigBlock'><div>You will be moved to a very short round of the searching game. You will be able to move around the maze using the touch buttons. The round will stop as soon as you have collected your first coin.</div></br></br><button class='nextButton' onclick='tutorial3()'>Let's go!</button></div>";
 }
 
 function tutorial3(){
     var container = document.getElementById("main_container");
-    container.innerHTML=`<div id='tempScore_container' class='tempScore'>Coins collected this round = 0</div><div id='round' class='round'>Round 1/1</div><div id='timer_container' class='timer'>No timer for the test round</div><div id='timer_c'></div><button id='goUpButton' onclick='human.moveUp()' class='upButton'><span>&#8593;</span></button> </br><button id='goLeftButton' onclick='human.moveLeft()' class='leftButton'><span>&#8592;</span></button><div id='maze_container' class = 'maze_container'></div><button id='goRightButton' onclick='human.moveRight()' class='rightButton'><span>&#8594;</span></button></br><button id='goDownButton' onclick='human.moveDown()' class='downButton'><span>&#8595;</span></button>`;
+    container.style.flexFlow = 'column wrap';
+    container.innerHTML=`<div class='row1' style = 'flex-direction: row;'><div id='tempScore_container'>Coins collected this round = 0</div><div id='round_container'>Round 1/1</div><div id='timer_container' class='timer'>No timer for the tutorial round</div></div><div class='row2' style = 'flex-direction: row;'><button class='moveButton' onclick='moveUp(human)'><span>&#8593;</span></button></div> <div class='row3' style = 'flex-direction: row;'><button class='moveButton' onclick='moveLeft(human)'><span>&#8592;</span></button><div id='maze_container' class = 'maze_container'></div><button onclick='moveRight(human)' class='moveButton'><span>&#8594;</span></button></div><div class='row4' style = 'flex-direction: row;'><button onclick='moveDown(human)' class='moveButton'><span>&#8595;</span></button></div>`;
 
     var center = document.getElementById("maze_container");
    
     center.style.backgroundColor = '#000000';
     center.style.alignContent = 'center';
-    center.innerHTML = "<button id='goRound' class='goRound' onclick='tutorial3b()' class='smallButton'>Start round</button>";
+    center.innerHTML = "<button id='goRound' onclick='tutorial3b()'>Start round</button>";
 }
 
 function tutorial3b(){
     var center = document.getElementById("maze_container");
-    center.innerHTML = maps[8]; //not random at all
-    // center.innerHTML = mapsOrder[mapsIndex]; //random within a set
 
     //adjust size (if not random maze) ========================
-    let mazeBoxInfo = document.getElementById("maze_container").getBoundingClientRect();
-    let sizeMaze = Math.min(mazeBoxInfo.height,mazeBoxInfo.width);
+    var mazeBoxInfo = document.getElementById("maze_container").getBoundingClientRect();
+    var sizeMaze = Math.min(mazeBoxInfo.height,mazeBoxInfo.width);
     document.getElementById("maze_container").style.height = sizeMaze;
     document.getElementById("maze_container").style.width = 1.5*sizeMaze;
+
+    center.innerHTML = tutoMap; //not random at all
+
+    var cell;
+    for(i = 1; i<=26;i++){
+        for(j = 1;j <=18;j++){
+            cell = document.getElementById("cell_" + j + "_" + i);
+            if(cell.getAttribute("isCoin")=="true"){
+                cell.style.backgroundColor = colors.coinColor;
+            }
+        } 
+    }
     
-    human.spawn();
+    spawn(human);
 }
 
 function tutorial4(){
@@ -93,7 +106,7 @@ function tutorial13(){
 
 function tutorial14(){
     var container = document.getElementById("main_container");
-    container.innerHTML= "<div class='bigBlock'><div>Based on this scoring mechanisms, you can earn an added bonus of 1 euro for each round where the team score surpasses [] points. Alternatively, you can earn an added bonus of 25 cents for each round where your individual score surpasses [] points. So consider your strategy carefully and decide whether you would like to work toward maximizing your individual score or the team score and potentially gaining an added bonus.</div></br></br><button class='nextButton' onclick='tutorial15()'>Next</button></div>";
+    container.innerHTML= "<div class='bigBlock'><div>Based on this scoring mechanisms, you can earn an added bonus of 1 euro for each game where the team score surpasses 100 points. Alternatively, you can earn an added bonus of 25 cents for each game where your individual score surpasses 15 points. So consider your strategy carefully and decide whether you would like to work toward maximizing your individual score or the team score and potentially gaining an added bonus.</div></br></br><button class='nextButton' onclick='tutorial15()'>Next</button></div>";
 }
 
 function tutorial15(){ // QUESTION 2.1
@@ -113,7 +126,7 @@ function tutorial17(){ //QUESTION 2.3
 
 function tutorial18(){
     var container = document.getElementById("main_container");
-    container.innerHTML= "<div class='bigBlock'><div>Congratulations! You finished the tutorial.</div></br></br><button class='nextButton' onclick='startExperiment()'>Go back to start menu</button></div>";
+    container.innerHTML= "<div class='bigBlock'><div>Congratulations! You finished the tutorial.</div></br></br><button class='nextButton' onclick='startExperiment2()'>Let's go to the games!</button></div>";
 }
 
 //MANAGING TUTORIAL QUESTIONS AND ANSWERS =============================================================================
@@ -134,7 +147,7 @@ function repA(question){
         document.getElementById(`bI_q${question}`).style.backgroundColor = "#222222";
     }
 
-    let answer;
+    var answer;
     switch(question){
         case 11:
             answer = "A human. I can see and control their movement during the game";
@@ -170,7 +183,7 @@ function repB(question){
         document.getElementById(`bI_q${question}`).style.backgroundColor = "#222222";
     }
 
-    let answer;
+    var answer;
     switch(question){
         case 11:
             answer = "A human. I cannot see and control their movement during the game";
@@ -203,7 +216,7 @@ function repC(question){
         document.getElementById(`bI_q${question}`).style.backgroundColor = "#222222";
     }
 
-    let answer;
+    var answer;
     switch(question){
         case 11:
             answer = "A robot. I can see and control their movement during the game";
@@ -343,7 +356,7 @@ function redotutorial(question, answer){
     //answer : the answer of the participant
     //question: the one wrongly answered (11, 12, 21, 22, 23 for 1.1, 1.2 etc)
 
-    let rightAnswer,goto;
+    var rightAnswer,goto;
 
     switch(question){
         case 11:

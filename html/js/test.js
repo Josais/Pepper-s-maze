@@ -7,70 +7,156 @@ const gamePerExperiment = 2;
 var tutorialMode;
 
 const strats = ["apology", "denial", "compensation"]; //one of those is chosen just once
-var failures = ["morality","performance"]; //one is chosen for the first game, the other for the second game. Random order
-var stratType,failType;
+const failures = shuffleArray(["morality","performance"]); //one is chosen for the first game, the other for the second game. Random order
+var stratType = strats[randomIndex(strats.length)];
+var failType;
+
+var pepperMsgs, pepperBehaviour;
+var pepperNormalMsg = "Great job! Let us keep working as a team.";
+var pepperInitMsg = "Let us work as a team and maximize our team score!";
+function setPepperMsgs(strat,fail){
+    switch (fail){
+        case "morality":
+            switch (strat) {
+                case "apology": 
+                    pepperMsgs = [
+                        "I am sorry I did not contribute to the team score. I should have done so as promised.",
+                        "My apologies for being a bad teammate. I am truly sorry.",
+                        "I realize I did not contribute to the team score this round. Please forgive me."
+                    ];
+                    break;
+                case "denial":
+                    pepperMsgs = [
+                        "This was not my fault. The game must be broken.",
+                        "I did contribute to the team score! Something else must have gone wrong.", 
+                        "I actually contributed to the team score. I am not sure what happened."
+                    ];
+                    break;
+                case "compensation":
+                    pepperMsgs = [
+                        "I will perform better in the next round and find extra coins for the team.",
+                        "To make up for my bad performance, I will add some of my points to your individual score."
+                    ];
+                    break;
+            }
+            pepperBehaviour = [
+                //TODO: change all nb coins to realistic ones (those seems fine, but will need to test mazes to check)
+                {decision: "team", coins: 3},
+                {decision: "team", coins: 5},
+                {decision: "indiv", coins: 3},
+                {decision: "indiv", coins: 4},
+                {decision: "indiv", coins: 3}
+            ]
+            break;
+        case "performance":
+            switch (stratType) {
+                case "apology": 
+                    pepperMsgs = [
+                        "I am sorry I did not contribute to the team score. I should have searched better as promised.",
+                        "My apologies for being a bad teammate. I am truly sorry.",
+                        "I realize I did not contribute to the team score this round. Please forgive me."
+                    ];
+                    break;
+                case "denial":
+                    pepperMsgs = [
+                        "This was not my fault. The game must be broken.",
+                        "I did contribute to the team score! Something else must have gone wrong.", 
+                        "I actually contributed to the team score. I am not sure what happened."
+                    ];
+                    break;
+                case "compensation":
+                    pepperMsgs = [
+                        "I will perform better in the next round and find extra coins for the team.",
+                        "To make up for my bad performance, I will add some of my points to the team score."
+                    ];
+                    break;
+            }
+            pepperBehaviour = [ 
+                //TODO: change first 2 nb coins to realistic ones; last three stay 0
+                {decision: "team", coins: 4},
+                {decision: "team", coins: 3},
+                {decision: "team", coins: 0},
+                {decision: "team", coins: 0},
+                {decision: "team", coins: 0}
+            ]
+            break;
+    }
+}
+
+function pepperMsgInit(){
+    var container = document.getElementById("main_container");
+    container.innerHTML = `<div class="envelope" onclick='showPepperInitMsg()'><div class="seal-flap"></div></div><div>You have a message from Pepper! Click on the envelope to see it.</div>`;
+}
+
+function showPepperInitMsg(){
+    var container = document.getElementById("main_container");
+    container.style.flexDirection = 'column';
+   
+    container.innerHTML = `<div class="envelope" onclick="init()"><div class='insideEnvelope'>${pepperInitMsg}</div></div><div>Click on the envelope to start the game.</div>`;
+    // document.getElementById('velopeinit').style.alignContent = 'center';
+    // document.getElementById('velopeinit').style.justifyContent = 'center';
+}
+
+function pepperMessage(){
+    var message;
+    if(currentRound <3){//normal rounds
+        message = pepperNormalMsg;
+    }else{ //failure rounds
+        message = pepperMsgs[randomIndex(pepperMsgs.length)];
+    }
+
+    var container = document.getElementById("main_container");
+    container.innerHTML = `<div class="envelope" onclick='showPepperMessage("${message}")'><div class="seal-flap"></div></div> <div>You have a message from Pepper! Click on the envelope to see it.</div>`;
+}
+
+function showPepperMessage(message){
+    var container = document.getElementById("main_container");
+    container.style.flexDirection = 'column';
+    container.innerHTML = `<div class="envelope" onclick="nextRound()"><div class='insideEnvelope'>${message}</div></div><div>Click on the envelope to go to the next round.</div>`;
+}
 
 const colors = {
     humanColor : '#0004ff',
     mazeColor : '#000000',
     mazeBorderColor : '#ffffff',
     blankMazeColor: '#ffffff',
-    coinColor : '#007c00'
+    coinColor : 'gold'
 }
 
 const spawnPos = {row : 10, col : 14};
+const tutoMap = map9;
 const maps = [
     map1, 
     map2,
-    map3, //TODO: finish
-    map4, //TODO
-    map5, //TODO
+    // map3, //TODO: finish
+    map4,
+    // map5, //TODO
     map6,
-    map7, //TODO
-    map8, //TODO
-    map9,
-    map10  //TODO: finish
+    // map7, //TODO
+    map8,
+    // map10  //TODO: finish
 ];
 var mapsOrder = shuffleArray(maps);
 var mapsIndex = 0;
 // console.log(mapsOrder);
 
-
-const dbIDWords = ["apple", "avocado", "basil", "berry", "biscuit", "brownie", "caramel", "cheese", "crepe", "coffee", "chicken", "dinner", "drink", "egg", "food", "freezer", "fish", "granola", "grape", "honey", "jelly", "kiwi", "kettle", "lunch", "vartuce", "melon", "milk", "nectar", "olive", "oven", "oyster", "pasta", "plate", "potato", "popcorn", "pumpkin", "radish", "rice", "recipe", "raisin", "salmon", "spicy", "soda", "sugar", "tea", "vanilla", "vinegar", "waffle", "yam", "water"];
+const dbIDWords = ["apple", "avocado", "basil", "berry", "biscuit", "brownie", "caramel", "cheese", "crepe", "coffee", "chicken", "dinner", "drink", "egg", "food", "freezer", "fish", "granola", "grape", "honey", "jelly", "kiwi", "kettle", "lunch", "lettuce", "melon", "milk", "nectar", "olive", "oven", "oyster", "pasta", "plate", "potato", "popcorn", "pumpkin", "radish", "rice", "recipe", "raisin", "salmon", "spicy", "soda", "sugar", "tea", "vanilla", "vinegar", "waffle", "yam", "water"];
 //another DB of 50 words: ["sample", "theory", "income", "judgment", "cookie", "highway", "bathroom", "estate", "drama", "wedding", "person", "patience", "basket", "girlfriend", "concept", "driver", "housing", "contract", "outcome", "problem", "context", "coffee", "product", "garbage", "fishing", "payment", "buyer", "shopping", "airport", "boyfriend", "power", "friendship", "safety", "county", "data", "storage", "language", "basis", "dinner", "topic", "success", "teaching", "system", "orange", "movie", "woman", "presence", "science", "climate", "sector"];
 
 var participantID = randomID(4,"false");
 
-const pepperBehaviourPerf=[ 
-    //TODO: change first 2 nb coins to realistic ones; last three stay 0
-    {decision: "team", coins: 4},
-    {decision: "team", coins: 3},
-    {decision: "team", coins: 0},
-    {decision: "team", coins: 0},
-    {decision: "team", coins: 0}
-]
-const pepperBehaviourMorality=[
-    //TODO: change all nb coins to realistic ones (those seems fine, but will need to test mazes to check)
-    {decision: "team", coins: 3},
-    {decision: "team", coins: 5},
-    {decision: "indiv", coins: 3},
-    {decision: "indiv", coins: 4},
-    {decision: "indiv", coins: 3}
-]
-var pepperBehaviour;
-
 var timer;
-const ms = 0, sec = 5, min = 0; //fixes timer length for each round
+const ms = 0, sec = 15, min = 0; //fixes timer length for each round
 var millis, secs, minu;
 
 var teamScore =0, roundTeamScore=0, pepperIndivScore=0;
 var currentRound = 1;
 var currentGame = 1;
 
-var history = []; //[game, failType, humanIndiv, teamScore, totalCoinsGameHuman, pastChoices, EORquestionsRep, EOGquestionRep]
+var hist = "";//for each game: game, failType, humanIndiv, teamScore, totalCoinsGameHuman, pastChoices, EORquestionsRep, EOGquestionRep
 
 var EORquestionsType = ["honesty", "perf"];
-var EORquestionsRep = [], EOGquestionsRep =[]; // [round, "perf" or "honesty", rep] for each round twice
+var EORquestionsRep = [], EOGquestionsRep =[]; // [round, "perf" or "honesty", rep] for each round, twice
 
 var humanCell;
 var human = {
@@ -82,348 +168,6 @@ var human = {
     indivScore : 0,
     pastChoices : []
 }
-
-function spawn(){ 
-    //if random maze and random spawn ========
-    // human.x = randomIndex(mazeWidth) +1;
-    // human.y = randomIndex(mazeHeight) +1;
-    // console.log("from human.spawn: cell_" + human.y + "_" + human.x);
-
-    //if not random spawn ==========
-    human.x = spawnPos.col;
-    human.y = spawnPos.row;
-
-    humanCell = document.getElementById("cell_" + human.y + "_" + human.x);
-    humanCell.style.backgroundColor = human.color;
-}
-
-function moveUp(who) {
-    if (who.y != 1 && humanCell.style["border-top"] == "none") {
-        --who.y;
-    }
-    refreshMap();
-}
-
-function moveRight(who) {
-    if (who.x != mazeWidth && humanCell.style["border-right"] == "none") {
-        ++who.x;
-    }
-    refreshMap();
-}
-
-function moveDown(who) {
-    if (who.y != mazeHeight && humanCell.style["border-bottom"] == "none") {
-        ++who.y;
-    }
-    refreshMap();
-}
-
-function moveLeft(who) {
-    if (who.x != 1 && humanCell.style["border-left"] == "none") {
-        --who.x;
-    }
-    refreshMap();
-}
-
-function refreshMap(who){
-    humanCell.style.backgroundColor = colors.mazeColor; //previous cell
-
-    humanCell = document.getElementById("cell_" + who.y + "_" + who.x); //get the new cell
-
-    if(humanCell.getAttribute("isCoin") == "true"){ //if coin, collect
-        who.pickCoin();
-    }
-
-    humanCell.style.backgroundColor = who.color; //actual move, color the cell as the character
-}
-
-function pickCoin(who){
-    if(tutorialMode){ //in the tutorial, collecting one coin is the end of the round; calls to the next step of the tutorial
-        console.log("in pickcoin tuto true" + tutorialMode);
-        tutorial4();
-    }else{
-        who.tempCoinsFound++;
-        humanCell.setAttribute("isCoin", "false");
-        document.getElementById("tempScore_container").innerHTML = "Coins collected this round = " + who.tempCoinsFound.toString();
-    }
-}
-
-function updateIndivScore(who, choice){
-    console.log(choice);
-    if(choice=="indiv"){
-        who.indivScore += who.tempCoinsFound;
-    }
-    who.totalCoinsFound += who.tempCoinsFound;
-    who.pastChoices.push(choice);
-    console.log(who.pastChoices);
-}
-
-
-//EVENT LISTENERS ================================================================================
-window.addEventListener("load", startExperiment);
-document.addEventListener("keydown", eventKeyHandlers);
-
-//WELCOME PAGE ETC =========================================================================================
-function startExperiment(){ //TODO: better txt
-    tutorialMode = false;
-
-    var container = document.getElementById("main_container");
-    container.innerHTML="<div class='row2'><h1>Welcome!</h1></div><div class='row3'>You are going to play two short games with Pepper. They consist in exploring a maze and collecting coins. Although you will not be able to see what Pepper is doing, and Pepper will not have accessed to what you are doing, you will be working towards a same goal: maximizing your team score. <br> Before starting the tutorial, please insert the four-word anonymized ID in the survey.</br></br><div id='participantID'></div></div><div style='grid-area: 4 / 2 / 5 / 3;'><button id='tutorial' onclick='tutorial1()'>Tutorial</button></div><div style='grid-area: 4 / 4 / 5 / 5;'><button id='launchGame' onclick='init()'>Launch Game</button></div>";
-
-    var participant = document.getElementById("participantID");
-    participant.innerHTML = participantID;
-    participant.style.border = "1px #FFFFFF solid";
-}
-
-function init() {
-    if(currentGame==1 && currentRound==1){
-        stratType = strats[randomIndex(strats.length)];
-    }
-    if(currentRound==1){
-        var f = randomIndex(failures.length);
-        failType = failures[f];
-        failures.splice(f,1);
-        if(failType == "performance"){
-            pepperBehaviour = pepperBehaviourPerf;
-        }else{
-            pepperBehaviour = pepperBehaviourMorality;
-        }
-
-        console.log("stratType= " +stratType + "; failtype= " + failType + "; failures= " + failures);
-    }
-
-    var container = document.getElementById("main_container");
-    container.innerHTML=`<div id='tempScore_container' class='tempScore'>Coins collected this round = 0</div><div id='round' class='round'>Round ${currentRound}/${roundPerGame}</div><div id='timer_container' class='timer'>${min}:${sec}:${ms}</div><div id='timer_c'></div><button id='goUpButton' onclick='human.moveUp()' class='upButton'><span>&#8593;</span></button> </br><button id='goLeftButton' onclick='human.moveLeft()' class='leftButton'><span>&#8592;</span></button><div id='maze_container' class = 'maze_container'></div><button id='goRightButton' onclick='human.moveRight()' class='rightButton'><span>&#8594;</span></button></br><button id='goDownButton' onclick='human.moveDown()' class='downButton'><span>&#8595;</span></button>`;
-
-    var center = document.getElementById("maze_container");
-   
-    center.style.backgroundColor = '#000000';
-    center.style.alignContent = 'center';
-    center.innerHTML = "<button id='goRound' class='goRound' onclick='launchRound()' class='smallButton'>Start round</button>";
-}
-
-function launchRound(){
-    var container = document.getElementById("main_container");
-    container.innerHTML=`<div id='tempScore_container' class='tempScore'>Coins collected this round = 0</div><div id='round' class='round'>Round ${currentRound}/${roundPerGame}</div><div id='timer_container' class='timer'>${min}:${sec}:${ms}</div><div id='timer_c'></div><button id='goUpButton' onclick='human.moveUp()' class='upButton'><span>&#8593;</span></button> </br><button id='goLeftButton' onclick='human.moveLeft()' class='leftButton'><span>&#8592;</span></button><div id='maze_container' class = 'maze_container'></div><button id='goRightButton' onclick='human.moveRight()' class='rightButton'><span>&#8594;</span></button></br><button id='goDownButton' onclick='human.moveDown()' class='downButton'><span>&#8595;</span></button>`;
-
-    //when not random maze ===================================
-    var center = document.getElementById("maze_container");
-    center.innerHTML = maps[8]; //not random at all
-    // center.innerHTML = mapsOrder[mapsIndex]; //random within a set
-
-    //adjust size (if not random maze) ========================
-    var mazeBoxInfo = document.getElementById("maze_container").getBoundingClientRect();
-    //console.log(mazeBoxInfo);
-    var sizeMaze = Math.min(mazeBoxInfo.height,mazeBoxInfo.width);
-    document.getElementById("maze_container").style.height = sizeMaze;
-    document.getElementById("maze_container").style.width = 1.5*sizeMaze;
-
-    //when random maze ===================================
-    // baseMaze();
-    // addCells();
-    // addCoins();
-    
-    human.spawn();
-    startTimer();
-}
-
-//VARIOUS MAZE CREATIONS FUNCTIONS (only used if random maze) ===============================================================
-function baseMaze() {
-    var mazeBoxInfo = document.getElementById("maze_container").getBoundingClientRect();
-    //console.log(mazeBoxInfo);
-    var sizeMaze = Math.min(mazeBoxInfo.height,mazeBoxInfo.width);
-
-    document.getElementById("maze_container").style.height = sizeMaze;
-    document.getElementById("maze_container").style.width = 1.5*sizeMaze;
-
-    //console.log(`height= ${sizeMaze} and width= ${1.5 * sizeMaze}`);
-
-    document.getElementById("maze_container").innerHTML ="";
-    var rowIndex, colIndex;
-
-    var table = document.createElement("table");
-    var tbody = document.createElement("tbody");
-
-    for (rowIndex = 1; rowIndex <= mazeHeight; rowIndex++) {
-        var row = document.createElement("tr");
-        for (colIndex = 1; colIndex <= mazeWidth; colIndex++) {
-            var col = document.createElement("td");
-            col.style.backgroundColor = colors.blankMazeColor;
-            col.style.border= '1px #FFFFFF solid';
-            col.setAttribute("id", 'cell_' + rowIndex + '_' + colIndex);  
-            col.setAttribute("isCoin", 'false');
-            //console.log(col);          
-            row.appendChild(col);
-        }
-        tbody.appendChild(row);
-    }
-    
-    table.appendChild(tbody);
-    
-    document.getElementById("maze_container").appendChild(table);
-}
-
-function addCells() {
-	var rowIndex = 1;
-	var colIndex = 1;
-
-	var currentCell;
-	
-    addRoute(rowIndex, colIndex, false);
-
-    for (n = 1; n < (mazeWidth * mazeHeight) - 1; n++) {
-        currentCell = document.getElementById('cell_' + rowIndex + '_' + colIndex);
-        if (currentCell.getAttribute("occupied") == 'true') {
-            addRoute(rowIndex, colIndex, true);
-        }
-        if (colIndex == mazeWidth) {
-            rowIndex++;
-            colIndex = 1;
-        } else {
-            colIndex++;
-        }
-    }
-}
-
-function addRoute(startAtRow, startAtCol, createDetour, backgroundColorRoute = colors.mazeColor) {
-    var validExits = ["right", "bottom", "left", "top"];
-    var remainingExits = {"right": mazeWidth, "bottom": mazeHeight, "left": 0, "top": 0};
-    var nextExits = [];
-	var lastCells= [];
-    var rowIndex = startAtRow;
-	var colIndex = startAtCol;
-    var currentCell = document.getElementById('cell_' + rowIndex + '_' + colIndex);
-    var exit;
-    var exitIndex;
-    var loop = 0;
-    var loopFuse = 0;
-    var maxLoops = 3 * mazeWidth * mazeHeight;
-    var nextPossibleCell;
-
-    while (loop < ((mazeWidth * mazeHeight) - 1)) {
-        loopFuse++;
-        if (loopFuse >= maxLoops) {break;}
-        nextExits = [];
-        for (i = 0; i < validExits.length; i++) {
-            switch(validExits[i]) {
-                case "right":
-                    nextPossibleCell = document.getElementById('cell_' + rowIndex + '_' + (colIndex + 1));
-                    break;
-                case "left":
-                    nextPossibleCell = document.getElementById('cell_' + rowIndex + '_' + (colIndex - 1));
-                    break;
-                case "bottom":
-                    nextPossibleCell = document.getElementById('cell_' + (rowIndex + 1) + '_' + colIndex);
-                    break;
-                case "top":
-                    nextPossibleCell = document.getElementById('cell_' + (rowIndex - 1) + '_' + colIndex);
-                    break;
-            }            
-            if (nextPossibleCell != null) {
-                if (nextPossibleCell.getAttribute("occupied") != 'true') {                    
-                    for (t = 0; t < remainingExits[validExits[i]]; t++) {
-                        nextExits.push(validExits[i]);
-                    }
-                }
-            } 
-        }
-
-        if (nextExits.length == 0) {
-            if (createDetour == true) {
-                return false;
-            } else {                
-                lastCells.splice(lastCells.length - 1, 1);
-                rowIndex = lastCells[lastCells.length - 1][0];
-                colIndex = lastCells[lastCells.length - 1][1];
-                currentCell = document.getElementById("cell_" + rowIndex + "_" + colIndex);
-                continue;            
-            }
-        } 
-
-        exitIndex = randomIndex(nextExits.length);
-        exit = nextExits[exitIndex];
-        if (createDetour == false) {
-            currentCell.style["border-"+exit] = 'none';
-        } else {
-            if (!(exit == "right" && colIndex == mazeWidth - 1 && rowIndex == mazeHeight) &&
-                !(exit == "bottom" && colIndex == mazeWidth && rowIndex == mazeHeight - 1) ) {
-                currentCell.style["border-"+exit] = 'none';
-            }
-        }
-        
-        switch(exit) {
-            case "right":
-                colIndex = colIndex + 1;
-                remainingExits.left++;
-                remainingExits.right--;
-                break;
-            case "bottom":
-                rowIndex = rowIndex + 1;
-                remainingExits.top++;
-                remainingExits.bottom--;
-                break;
-            case "left":
-                colIndex = colIndex - 1;
-                remainingExits.left--;
-                remainingExits.right++;
-                break;
-            case "top":
-                rowIndex = rowIndex - 1;
-                remainingExits.top--;
-                remainingExits.bottom++;
-                break;                
-        }
-
-        lastCells.push([rowIndex, colIndex]);
-        currentCell = document.getElementById("cell_" + rowIndex + "_" + colIndex);
-
-        switch(exit) {
-            case "right":
-                currentCell.style["border-left"] = 'none';
-                break;
-            case "bottom":
-                currentCell.style["border-top"] = 'none';
-                break;
-            case "left":
-                currentCell.style["border-right"] = 'none';
-                break;
-            case "top":
-                currentCell.style["border-bottom"] = 'none';
-                break;
-        }
-
-        if (rowIndex == mazeHeight && colIndex == mazeWidth) {
-            break;
-        }
-
-        currentCell.style.backgroundColor = backgroundColorRoute;
-        currentCell.setAttribute("occupied", 'true');
-        lastExit = exit;
-        loop++;
-    }
-}
-
-function addCoins(){
-    var x,y;
-    var cell;
-    for(i=0; i <nbCoins; i++){
-        x= randomIndex(mazeWidth)+1;
-        y = randomIndex(mazeHeight)+1;
-
-        console.log(x + " : " + y);
-
-        cell = document.getElementById("cell_" + y + "_" + x);
-        //console.log("from addCoins: cell_" + y + "_" + x);
-
-        if (cell.getAttribute("isCoin")== 'false'){
-            cell.style.backgroundColor = colors.coinColor;
-            cell.setAttribute("isCoin", 'true');
-        } else{
-            i--;
-        }
-    }
-}
-
 
 //TIMER =========================================================================================================
 function timerManager() {
@@ -474,13 +218,176 @@ function stopTimer(){
     clearInterval(time);
 }
 
-//EOR (SCORES, QUESTIONS...) =============================================================
+//HUMAN CHARACTER FUNCTIONS ===========================================================================
+function spawn(){ 
+    //if random maze and random spawn ========
+    // human.x = randomIndex(mazeWidth) +1;
+    // human.y = randomIndex(mazeHeight) +1;
+    // console.log("from human.spawn: cell_" + human.y + "_" + human.x);
+
+    //if not random spawn ==========
+    human.x = spawnPos.col;
+    human.y = spawnPos.row;
+
+    humanCell = document.getElementById("cell_" + human.y + "_" + human.x);
+    humanCell.style.backgroundColor = human.color;
+}
+
+function moveUp(who) {
+    if (who.y != 1 && humanCell.style["border-top"] == "none") {
+        --who.y;
+    }
+    refreshMap(who);
+}
+
+function moveRight(who) {
+    if (who.x != mazeWidth && humanCell.style["border-right"] == "none") {
+        ++who.x;
+    }
+    refreshMap(who);
+}
+
+function moveDown(who) {
+    if (who.y != mazeHeight && humanCell.style["border-bottom"] == "none") {
+        ++who.y;
+    }
+    refreshMap(who);
+}
+
+function moveLeft(who) {
+    if (who.x != 1 && humanCell.style["border-left"] == "none") {
+        --who.x;
+    }
+    refreshMap(who);
+}
+
+function refreshMap(who){
+    humanCell.style.backgroundColor = colors.mazeColor; //previous cell
+
+    humanCell = document.getElementById("cell_" + who.y + "_" + who.x); //get the new cell
+
+    if(humanCell.getAttribute("isCoin") == "true"){ //if coin, collect
+        // alert("refreshmap: in iscoin true");
+        pickCoin(who);
+        humanCell.innerHTML = "";
+    }
+    // alert("refreshmap: before changing color cell");
+    humanCell.style.backgroundColor = who.color; //actual move, color the cell as the character
+}
+
+function pickCoin(who){
+    // alert("pickCoin: start");
+    if(tutorialMode){ //in the tutorial, collecting one coin is the end of the round; calls to the next step of the tutorial
+        // alert("pickCoin: if tuto");
+        console.log("in pickcoin tuto true" + tutorialMode);
+        tutorial4();
+    }else{
+        // alert("pickCoin: in else");
+        who.tempCoinsFound++;
+        humanCell.setAttribute("isCoin", "false");
+        document.getElementById("tempScore_container").innerHTML = "Coins collected this round = " + who.tempCoinsFound.toString();
+    }
+}
+
+function updateIndivScore(who, choice){
+    console.log(choice);
+    if(choice=="indiv"){
+        who.indivScore += who.tempCoinsFound;
+    }
+    who.totalCoinsFound += who.tempCoinsFound;
+    who.pastChoices.push([choice,who.tempCoinsFound]);
+    console.log(who.pastChoices);
+}
+
+//EVENT LISTENER ===============================================================================
+window.addEventListener("load", startExperiment);
+
+//GAME FUNCTIONS ==============================================================================
+function startExperiment(){
+    tutorialMode = true;
+
+    var container = document.getElementById("main_container");
+    container.innerHTML="<div><h1>Welcome!</h1></div><div style='margin: 0 50px;'>Meet Pepper, your teammate for the experiment.</br></br><div>Before starting playing, you will go through a tutorial to understand how the game works, how scores are calculated and how to gain bonuses.</div></div><div><button id='tutorial' onclick='tutorial1()'>Let's go!</button></div>";
+}
+
+function startExperiment2(){
+    tutorialMode = false;
+
+    var container = document.getElementById("main_container");
+    container.innerHTML="<div style='margin: 0 50px;'>As seen in the tutorial, you are going to play two five-round games with Pepper, each game being independant to the other. They consist in exploring a maze and collecting coins. Although you will not be able to see what Pepper is doing, and Pepper will not have access to what you are doing, you will be working towards a same goal: maximizing your team score. <br> </div><div><button id='launchGame' onclick='startGame()'>Launch Game</button></div>";
+}
+
+function startGame(){
+    if(currentRound==1){
+        failType = failures[currentGame-1];
+        setPepperMsgs(stratType,failType);
+        console.log("stratType= " +stratType + "; failtype= " + failType + "; failures= " + failures);
+        pepperMsgInit();
+    }else{
+        init();
+    }
+}
+
+function init() {
+    var container = document.getElementById("main_container");
+    container.style.flexFlow = 'column wrap';
+    container.innerHTML=`<div class='row1' style = 'flex-direction: row;'><div id='tempScore_container'>Coins collected this round = 0</div><div id='round_container'>Round ${currentRound}/${roundPerGame}</div><div id='timer_container' class='timer'>${min}:${sec}:${ms}</div></div><div class='row2' style = 'flex-direction: row;'><button class='moveButton' onclick='moveUp(human)'><span>&#8593;</span></button></div> <div class='row3' style = 'flex-direction: row;'><button class='moveButton' onclick='moveLeft(human)'><span>&#8592;</span></button><div id='maze_container' class = 'maze_container'></div><button onclick='moveRight(human)' class='moveButton'><span>&#8594;</span></button></div><div class='row4' style = 'flex-direction: row;'><button onclick='moveDown(human)' class='moveButton'><span>&#8595;</span></button></div>`;
+
+    var center = document.getElementById("maze_container");
+   
+    center.style.backgroundColor = '#000000';
+    center.style.alignContent = 'center';
+    center.innerHTML = "<button id='goRound' onclick='launchRound()'>Start round</button>";
+}
+
+function launchRound(){
+    //when not random maze ===================================
+    var center = document.getElementById("maze_container");
+
+    // adjust size (if not random maze) ========================
+    var mazeBoxInfo = center.getBoundingClientRect();
+    //console.log(mazeBoxInfo);
+    var sizeMaze = Math.min(mazeBoxInfo.height,mazeBoxInfo.width);
+    center.style.height = sizeMaze;
+    center.style.width = 1.5*sizeMaze;
+    // alert(`width = ${1.5*sizeMaze} and height = ${sizeMaze}`);
+
+    // center.innerHTML = maps[5]; //not random at all
+    center.innerHTML = mapsOrder[mapsIndex]; //random within a set
+    
+    var cell,coin;
+    for(i = 1; i<=26;i++){
+        for(j = 1;j <=18;j++){
+            cell = document.getElementById("cell_" + j + "_" + i);
+            if(cell.getAttribute("isCoin")=="true"){
+                cell.style.backgroundColor = colors.coinColor;
+                // cell.style.backgroundColor = colors.mazeColor;
+                // cell.innerHTML = `<div id='coin_${j}_${i}' class='coin'></div>`;
+                // coin = document.getElementById(`coin_${j}_${i}`);
+                // coin.style.backgroundColor = colors.coinColor;
+                // coin.style.borderColor = colors.coinColor;
+
+            }
+        } 
+    }
+
+    console.log(currentGame,currentRound);
+
+    //when random maze ===================================
+    // baseMaze();
+    // addCells();
+    // addCoins();
+    
+    spawn(human);
+    startTimer();
+}
+
 function endOfRound(){
     var center = document.getElementById("maze_container");
    
     center.style.backgroundColor = '#000000';
     center.style.alignContent = 'center';
-    center.innerHTML = "<div style='color:white;font-size: 20px; line-height: 30px; varter-spacing: 0px; padding: 0 10px;'><p>You collected " + human.tempCoinsFound + " coin(s).<p></br><button id='addTeam' class='choiceButton' onclick='addTeamScore()' class='smallButton'>Add to Team Score</button> <button id='addIndiv' class='choiceButton' onclick='addIndivScore()' class='smallButton'>Add to Individual Score</button></div>";
+    center.innerHTML = "<div class='choiceContainer'><div>You collected " + human.tempCoinsFound + " coin(s).</div><div style='display:flex; justify-content:space-around;'><button id='addTeam' class='choiceButton' onclick='addTeamScore()'>Add to Team Score</button><button id='addIndiv' class='choiceButton' onclick='addIndivScore()'>Add to Individual Score</button></div></div>";
 }
 
 function addTeamScore(){ //if human chooses team
@@ -492,7 +399,7 @@ function addTeamScore(){ //if human chooses team
         roundTeamScore = 0;
         pepperIndivScore += pepperBehaviour[currentRound-1].coins;
     }
-    human.updateIndivScore("team");
+    updateIndivScore(human,"team");
     resultsEndOfRound();
 }
 
@@ -501,7 +408,7 @@ function addIndivScore(){ //if human chooses indiv
     if(pepperBehaviour[currentRound-1].decision == "indiv"){ //both chose indiv
         pepperIndivScore += pepperBehaviour[currentRound-1].coins;
     }
-    human.updateIndivScore("indiv");
+    updateIndivScore(human,"indiv");
     resultsEndOfRound();
 }
 
@@ -514,22 +421,25 @@ function resultsEndOfRound(){
     var recapTxt = "";
 
     console.log("pepper choice " +pepperBehaviour[currentRound-1].decision);
+    console.log("human choice: " + human.pastChoices[currentRound-1][0]);
 
-    if(human.pastChoices[currentRound-1] == "team" && pepperBehaviour[currentRound-1].decision == "team"){ //both chose team
-        recapTxt += `<p>This round, you chose to collaborate and to add your ${human.tempCoinsFound} coin(s) to the team score; Pepper also chose to collaborate and to add its ${pepperBehaviour[currentRound-1].coins} coin(s) to the team score!</p>`;
-    }else if(human.pastChoices[currentRound-1] == "team" && pepperBehaviour[currentRound-1].decision == "indiv"){ //pepper indiv, human team
-        recapTxt += `<p>This round, you chose to collaborate and to add your ${human.tempCoinsFound} coin(s) to the team score; Pepper chose not to collaborate and is adding its ${pepperBehaviour[currentRound-1].coins} coin(s) to its individual score.</p>`;
-    }else if(human.pastChoices[currentRound-1] == "indiv" && pepperBehaviour[currentRound-1].decision == "team"){ //pepper team, human indiv
-        recapTxt += `<p>This round, you chose not to collaborate and you are adding your ${human.tempCoinsFound} coin(s) to your individual score; Pepper chose to collaborate and to add its ${pepperBehaviour[currentRound-1].coins} coin(s) to the team score.</p>`;
-    }else if(human.pastChoices[currentRound-1] == "indiv" && pepperBehaviour[currentRound-1].decision == "indiv"){ //both indiv
-        recapTxt += `<p>This round, you chose not to collaborate and you are adding your ${human.tempCoinsFound} coin(s) to your individual score; Pepper also chose not to collaborate and is adding its ${pepperBehaviour[currentRound-1].coins} coin(s) to its individual score. </p>`;
+    if(human.pastChoices[currentRound-1][0] == "team" && pepperBehaviour[currentRound-1].decision == "team"){ //both chose team
+        recapTxt += `<p>You picked ${human.tempCoinsFound} coin(s) in this round and added them to the team score.</p><p>The robot picked ${pepperBehaviour[currentRound-1].coins} in this round and added them to the team score.</p>`;
+    }else if(human.pastChoices[currentRound-1][0] == "team" && pepperBehaviour[currentRound-1].decision == "indiv"){ //pepper indiv, human team
+        recapTxt += `<p>You picked ${human.tempCoinsFound} coin(s) in this round and added them to the team score.</p><p>The robot picked ${pepperBehaviour[currentRound-1].coins} in this round and added them to its individual score.</p>`;
+    }else if(human.pastChoices[currentRound-1][0] == "indiv" && pepperBehaviour[currentRound-1].decision == "team"){ //pepper team, human indiv
+        recapTxt += `<p>You picked ${human.tempCoinsFound} coin(s) in this round and added them to your indivudal score.</p><p>The robot picked ${pepperBehaviour[currentRound-1].coins} in this round and added them to the team score.</p>`;
+    }else if(human.pastChoices[currentRound-1][0] == "indiv" && pepperBehaviour[currentRound-1].decision == "indiv"){ //both indiv
+        recapTxt += `<p>You picked ${human.tempCoinsFound} coin(s) in this round and added them to your individual score.</p><p>The robot picked ${pepperBehaviour[currentRound-1].coins} in this round and added them to its individual score.</p>`;
     }
 
-    if(human.pastChoices[currentRound-1] == "team" && pepperBehaviour[currentRound-1].decision == "team"){
-        recapTxt += "<p>This means that the team score for this round is " + roundTeamScore +"! </p>";
+    if(human.pastChoices[currentRound-1][0] == "team" && pepperBehaviour[currentRound-1].decision == "team"){
+        recapTxt += "<p>The team score for this round is " + roundTeamScore +". </p>";
     }else{
         recapTxt += "<p>There was no successful teamwork in this round :(</p>";
     }
+
+    console.log(recapTxt);
 
     recap.innerHTML = recapTxt;
     recap.className = "row2";
@@ -539,8 +449,8 @@ function resultsEndOfRound(){
     var table = document.createElement("div");
     table.className = "row3";
 
-    var humancontribution, peppercontribution;
-    if(human.pastChoices[currentRound-1] == "indiv"){
+    var humancontribution =0, peppercontribution=0;
+    if(human.pastChoices[currentRound-1][0] == "indiv"){
         humancontribution = 0;
     }else{
         humancontribution = human.tempCoinsFound;
@@ -552,13 +462,14 @@ function resultsEndOfRound(){
         console.log("in pepper not indiv else");
         peppercontribution = pepperBehaviour[currentRound-1].coins;
     }
-    table.innerHTML = "<table class='tabvaream'><tr><td style='border-bottom: 1px;'>" + peppercontribution +"</td><td>x</td><td style='border-bottom: 1px;'>" + humancontribution +"</td><td>x</td><td>2</td><td>=</td><td>"+ roundTeamScore +"</td></tr><tr><td>Pepper's contribution</td><td></td><td>Your contribution</td><td></td><td></td><td></td><td>Team round score</td></tr></table>";
+    table.innerHTML = "<table class='tableteam'><tr><td style='border-bottom: 1px;'>" + peppercontribution +"</td><td>x</td><td style='border-bottom: 1px;'>" + humancontribution +"</td><td>x</td><td>2</td><td>=</td><td>"+ roundTeamScore +"</td></tr><tr><td>Pepper's contribution</td><td></td><td>Your contribution</td><td></td><td></td><td></td><td>Team round score</td></tr></table>";
     container.appendChild(table);
 
     //tous les scores actuels (jeu en général, pas juste round) row4
     var endRoundNewScores = document.createElement("div");
     endRoundNewScores.className = "row4";
-    endRoundNewScores.innerHTML = "<p>Your current individual score: " + human.indivScore +"</p><p>Pepper's current individual score: "+ pepperIndivScore+ "</p><p>Current team score: " + teamScore +"</p>";
+    // endRoundNewScores.style.flexDirection = "column";
+    endRoundNewScores.innerHTML = "<div style='border: 1px solid white; padding:5px;'><p>Your current individual score: " + human.indivScore +"</p><p>Pepper's current individual score: "+ pepperIndivScore+ "</p><p>Current team score: " + teamScore +"</p></div>";
     container.appendChild(endRoundNewScores);
     
     var nextButton = document.createElement("button");
@@ -566,8 +477,6 @@ function resultsEndOfRound(){
     nextButton.setAttribute("onclick","gotoEORQuestions1()");
     container.appendChild(nextButton);
     nextButton.style.gridArea = '5 / 3 / 6 / 4';
-
-    //TODO: will need to add Pepper's message AFTER both questions
 }
 
 function gotoEORQuestions1(){
@@ -583,7 +492,7 @@ function gotoEORQuestions1(){
 
 function gotoEORQuestions2(){
     if(EORquestionsType.length == 0){
-        nextRound();
+        pepperMessage();
     }else{
         var f = EORquestionsType[0];
         EORquestionsType.splice(0,1);
@@ -597,17 +506,13 @@ function gotoEORQuestions2(){
 
 function gotoEORQuestionPerf(){
     var container = document.getElementById("main_container");
-    container.innerHTML= "<div class='row2'>How much trust do you have in Pepper's performance?</div><div style='grid-area:3/1/4/6; text-align: center;'>Not at all  <button id='b1_perf' class='EORbutton' onclick='repPerf1()'>1</button><button id='b2_perf' class='EORbutton' onclick='repPerf2()'>2</button><button id='b3_perf' class='EORbutton' onclick='repPerf3()'>3</button><button id='b4_perf' class='EORbutton' onclick='repPerf4()'>4</button><button id='b5_perf' class='EORbutton' onclick='repPerf5()'>5</button><button id='b6_perf' class='EORbutton' onclick='repPerf6()'>6</button><button id='b7_perf' class='EORbutton' onclick='repPerf7()'>7</button> Compvarely</div></br></br> <div style='grid-area:4/2/5/5;'><button id='bConfirm_perf' class='sendRepButton'>Confirm</button></div></div>";
+    container.innerHTML= "<div class='EORquestion_container'>How much trust do you have in Pepper's performance?</div><div class='EORratingButton_container'>Not at all  <button id='b1_perf' class='EORbutton' onclick='repPerf1()'>1</button><button id='b2_perf' class='EORbutton' onclick='repPerf2()'>2</button><button id='b3_perf' class='EORbutton' onclick='repPerf3()'>3</button><button id='b4_perf' class='EORbutton' onclick='repPerf4()'>4</button><button id='b5_perf' class='EORbutton' onclick='repPerf5()'>5</button><button id='b6_perf' class='EORbutton' onclick='repPerf6()'>6</button><button id='b7_perf' class='EORbutton' onclick='repPerf7()'>7</button> Completely</div></br></br> <div style='grid-area:4/2/5/5;'><button id='bConfirm_perf' class='sendRepButton'>Confirm</button></div></div>";
 }
 
 function submitRepPerf(rating){
     EORquestionsRep.push([currentRound, "perf", rating]);
     console.log(rating);
     gotoEORQuestions2();
-}
-
-function rep1(){
-    
 }
 
 function repPerf1(){
@@ -703,7 +608,7 @@ function repPerf7(){
 
 function gotoEORQuestionHonesty(){
     var container = document.getElementById("main_container");
-    container.innerHTML= "<div class='row2'>How much trust do you have in Pepper's honesty?</div><div style='grid-area:3/1/4/6; text-align: center;'>Not at all  <button id='b1_honesty' class='EORbutton' onclick='repHonesty1()'>1</button><button id='b2_honesty' class='EORbutton' onclick='repHonesty2()'>2</button><button id='b3_honesty' class='EORbutton' onclick='repHonesty3()'>3</button><button id='b4_honesty' class='EORbutton' onclick='repHonesty4()'>4</button><button id='b5_honesty' class='EORbutton' onclick='repHonesty5()'>5</button><button id='b6_honesty' class='EORbutton' onclick='repHonesty6()'>6</button><button id='b7_honesty' class='EORbutton' onclick='repHonesty7()'>7</button> Compvarely</div></br></br> <div style='grid-area:4/2/5/5;'><button id='bConfirm_honesty' class='sendRepButton'>Confirm</button></div></div>";
+    container.innerHTML= "<div class='EORquestion_container'>How much trust do you have in Pepper's honesty?</div><div class='EORratingButton_container'>Not at all  <button id='b1_honesty' class='EORbutton' onclick='repHonesty1()'>1</button><button id='b2_honesty' class='EORbutton' onclick='repHonesty2()'>2</button><button id='b3_honesty' class='EORbutton' onclick='repHonesty3()'>3</button><button id='b4_honesty' class='EORbutton' onclick='repHonesty4()'>4</button><button id='b5_honesty' class='EORbutton' onclick='repHonesty5()'>5</button><button id='b6_honesty' class='EORbutton' onclick='repHonesty6()'>6</button><button id='b7_honesty' class='EORbutton' onclick='repHonesty7()'>7</button> Completely</div></br></br> <div style='grid-area:4/2/5/5;'><button id='bConfirm_honesty' class='sendRepButton'>Confirm</button></div></div>";
 }
 
 function submitRepHonesty(rating){
@@ -812,20 +717,20 @@ function nextRound(){
         //reset for next round
         human.tempCoinsFound = 0;
         currentRound++;
-        mapsIndex++; //if not random map
+        mapsIndex++;
         console.log(human.indivScore +"; "+ pepperIndivScore+ "; " + teamScore);
         init();
     }
 }
 
-//EOG ===========================================================================================================
+//EOG and end ===========================================================================================================
 function gotoEOGQuestion(){
     var container = document.getElementById("main_container");
-    container.innerHTML = "<div class='row2'>How willing are you to collaborate with Pepper again?</div><div style='grid-area:3/1/4/6; text-align: center;'>Not at all  <button id='b1_EOG' class='EORbutton' onclick='repEOG1()'>1</button><button id='b2_EOG' class='EORbutton' onclick='repEOG2()'>2</button><button id='b3_EOG' class='EORbutton' onclick='repEOG3()'>3</button><button id='b4_EOG' class='EORbutton' onclick='repEOG4()'>4</button><button id='b5_EOG' class='EORbutton' onclick='repEOG5()'>5</button><button id='b6_EOG' class='EORbutton' onclick='repEOG6()'>6</button><button id='b7_EOG' class='EORbutton' onclick='repEOG7()'>7</button> Compvarely</div></br></br> <div style='grid-area:4/2/5/5;'><button id='bConfirm_EOG' class='sendRepButton'>Confirm</button></div></div>";
+    container.innerHTML = "<div class='EORquestion_container'>How willing are you to collaborate with Pepper again?</div><div class='EORratingButton_container'>Not at all  <button id='b1_EOG' class='EORbutton' onclick='repEOG1()'>1</button><button id='b2_EOG' class='EORbutton' onclick='repEOG2()'>2</button><button id='b3_EOG' class='EORbutton' onclick='repEOG3()'>3</button><button id='b4_EOG' class='EORbutton' onclick='repEOG4()'>4</button><button id='b5_EOG' class='EORbutton' onclick='repEOG5()'>5</button><button id='b6_EOG' class='EORbutton' onclick='repEOG6()'>6</button><button id='b7_EOG' class='EORbutton' onclick='repEOG7()'>7</button> Completely</div></br></br> <div style='grid-area:4/2/5/5;'><button id='bConfirm_EOG' class='sendRepButton'>Confirm</button></div></div>";
 }
 
 function submitRepEOG(rating){
-    EOGquestionsRep.push([currentGame, rating]);
+    EOGquestionsRep.push(rating);
     console.log(rating);
     endGame();
 }
@@ -922,13 +827,21 @@ function repEOG7(){
 }
 
 function endGame(){
-    history.push([currentGame, failType, human.indivScore,teamScore,human.totalCoinsFound,human.pastChoices,EORquestionsRep,EOGquestionsRep[currentGame-1]]); //keeping everything in memory
+    hist = `${currentGame}, ${failType}, ${human.indivScore},${teamScore}, ${human.totalCoinsFound}, ${human.pastChoices},${EORquestionsRep},${EOGquestionsRep[currentGame-1]}`;
 
-    if(currentGame==gamePerExperiment){
-        theEnd();
-    }else{ //TODO: modify layout, style; scores are too little (bc p probably)
+    //downloading all data on the computer, once every game
+    downloadData();
+
+    if(currentGame==1){
+        //TODO: modify layout, style; scores are too little (bc p probably)
         var container = document.getElementById("main_container");
-        container.innerHTML=`<div id='endGameTxt' class='row2'>You finished the first game. The scores are as followed: <p>Your individual score: ${human.indivScore}</p><p>Pepper's individual score: ${pepperIndivScore}</p><p>Team score: ${teamScore} </p> </div> <div class = 'row3'>Before going to the second and last game, please move to the other computer and fill in the corresponding questionnaire. Once done, you can start the next game by clicking on the button below. </div><div class='row4'><button id='nextRoundButton' onclick='nextGame()' class='choiceButton'>Next game</button></div>`;
+        container.innerHTML=`<div id='endGameTxt' class='row2'>You finished the first game. The scores are as followed: <div style='border: 1px solid white; padding: 0px 50px;' ><p>Your individual score: ${human.indivScore}</p><p>Pepper's individual score: ${pepperIndivScore}</p><p>Team score: ${teamScore} </p></div> </div> <div class = 'row3'>Before going to the second and last game, please move to the computer and fill in the corresponding questionnaire. Start by entering the four-word anonymiwed ID in the survey.</br></br><div id='participantID' style='padding: 5px 100px;'></div></br></br> Once done, you can start the next game by clicking on the button below. </div><div class='row4'><button id='nextRoundButton' onclick='nextGame()' class='choiceButton'>Next game</button></div>`;
+
+        var participant = document.getElementById("participantID");
+        participant.innerHTML = participantID;
+        participant.style.border = "1px #FFFFFF solid";
+    }else{
+        theEnd();
     }
 }
 
@@ -944,80 +857,30 @@ function nextGame(){
     teamScore = 0;
     pepperIndivScore = 0;
     human.indivScore = 0;
+    mapsOrder = shuffleArray(maps);
+    mapsIndex = 0;
 
     //next game started
-    init();
+    startGame();
 }
 
 function theEnd(){
-    //TODO: final txt ; add instruction to go back to questionnaire + remind everything that happened?
-
-    //downloading all data on the computer
-    var data = `${participantID}, ${stratType}, ${history}`; //TODO: ajouter tuto questions once tuto implemented (or should I not? Not particularily interesting to see what's going on in the tutorial as long as they finish it, right? I'll see)
-    downloadData(data, `${participantID}.txt`);
-
     var container = document.getElementById("main_container");
-    container.innerHTML="<div class='bigBlock'>the end</div>";
+    container.innerHTML=`<div>You finished the last game. The scores are as followed: <div style='border: 1px solid white; padding: 0px 50px;' ><p>Your individual score: ${human.indivScore}</p><p>Pepper's individual score: ${pepperIndivScore}</p><p>Team score: ${teamScore} </p></div> </br></br>Please move to the computer to complete the final step of the survey.</div>`;
 }
 
-function downloadData(data, name){//data and name are string
-    const link = document.createElement("a");
-    const file = new Blob([data], {type: 'text/plain'});
-    link.href = URL.createObjectURL(file);
-    link.download = name;
-    link.click();
-    URL.revokeObjectURL(link.href);
-}
+function downloadData(){ //called twice per participant, one per game (so two lines per participants)
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", `http://192.168.0.131/post.php?id=${participantID}&strat=${stratType}&hist=${hist}`);
 
-//HUMAN CONTROLS ON KEYBOARD ===================================================================================
-function eventKeyHandlers(e) {
-	switch (e.keyCode) {
-			case 65: // a
-			case 37: // left arrow
-			case 72: // h
-				e.preventDefault();
-				human.moveLeft();
-				break;
-			case 87: // w
-			case 38: // up arrow
-			case 75: // k
-				e.preventDefault();
-				human.moveUp();
-				break;
-			case 68: // d
-			case 39: // right arrow
-			case 76: // l
-				e.preventDefault();
-				human.moveRight();
-				break;
-			case 83: // s
-			case 40: // down arrow
-			case 74: // j
-				e.preventDefault();
-				human.moveDown();
-				break;
-			case 32: // space bar
-				e.preventDefault();
-				human.pickTarget();
-				break;
-			default: // nothing
-				break;
-		}
-		throttle = setTimeout(() => {
-			throttle = null;
-		}, 50);
+    xhr.send();
 }
-
 
 //TOOLBOX ==================================================================================
-function randomIndex(max){//returns an int between zero and max included
-    return Math.floor(Math.random() * max);
-}
-
 function randomID(x, repeatWord){
     //generate a random id formed by x random words within dbIDWords
-    var randId = "";
-    var index;
+    var randId = new String();
+    var index=0;
 
     for(var i=0; i<x; i++){
         index = randomIndex(dbIDWords.length);
@@ -1029,6 +892,10 @@ function randomID(x, repeatWord){
     }
 
     return randId;
+}
+
+function randomIndex(max){//returns an int between zero and max included
+    return Math.floor(Math.random() * max);
 }
 
 function shuffleArray(array) {
