@@ -940,7 +940,7 @@ function nextGame(){ //reset everything for the next game
     mapsOrder = shuffleArray(maps);
     mapsIndex = 0;
 
-    //next game started
+    //next game starts
     startGame();
 }
 
@@ -962,14 +962,14 @@ function theEnd(){
     container.innerHTML=`<div class ='row2'>${message1} The scores are as followed: </br></br><div style='border: 1px solid white; padding: 0px 50px;' ><p>Your individual score: ${human.indivScore}</p><p>Pepper's individual score: ${pepperIndivScore}</p><p>Team score: ${teamScore} </p></div> </br></br>${message2}`;
 }
 
-function downloadData(){ 
-    //called twice per participant, once per game (so two lines per participants)
+// function downloadData(){ 
+//     //called twice per participant, once per game (so two lines per participants)
 
-    var xhr = new XMLHttpRequest();
-    xhr.open("GET", `https://ics-pepper.science.uu.nl/html/post.php?id=${participantID}&strat=${stratType}&hist=${hist}`);
+//     var xhr = new XMLHttpRequest();
+//     xhr.open("GET", `https://ics-pepper.science.uu.nl/html/post.php?id=${participantID}&strat=${stratType}&hist=${hist}`);
 
-    xhr.send();
-}
+//     xhr.send();
+// }
 
 //MAZE CREATIONS FUNCTIONS (only used if randomMazeGen == true) ===============================================================
 function baseMaze() {

@@ -8,11 +8,11 @@ const dispoTrustItems = {
     dt8: "I am likely to trust a robot even when I have little knowledge about it."
 }
 const rosas_mdmtItems= { 
-    //MDMT-V2 scale:
-    //r: reliable subscale / c: competent subscale / e: ethical subscale / t: transparent subscale / b: benevolent subscale
+    //MDMT-V2 subscales:
+    //r: reliable / c: competent / e: ehtical  / t: transparent / b: benevolent
 
-    //ROSAS:
-    //w: warmth subscale / d: discomfort subscale
+    //ROSAS subscales:
+    //w: warmth / d: discomfort 
 
     r1: "reliable",
     r2: "predictable",
