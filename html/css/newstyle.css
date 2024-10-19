@@ -138,6 +138,18 @@ table {
     text-align: center;
 }
 
+table td 
+{
+  table-layout:fixed;
+  width:20px;
+  height:20px;
+  /* text-align: center; */
+  align-items: center;
+  justify-content: center;
+  overflow:hidden;
+  /* word-wrap:break-word; */
+}
+
 .mapmap{
     width: 500px;
     height: 100%;
@@ -186,3 +198,10 @@ div.col {
     border: 1px solid;
     border-radius: 50%;
 }
+
+/* .participant{
+    width: 15px;
+    height:15px;
+    padding: 0px;
+    margin: 0px;
+} */

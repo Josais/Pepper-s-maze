@@ -4,7 +4,7 @@
 function tutorial1(){
     tutorialMode = true;
     var container = document.getElementById("main_container");
-    container.innerHTML= "<div class='bigBlock'><div>This is the <span style='color: #FF3131'>playground</span>. Yellow cells represents coins. You are the blue cell. You can move around the maze by pressing <span style='color: #00BF63'>those buttons</span> on the screen.</div><img src='img/maze.png' width='600px'></img> </br></br><button class='nextButton' onclick='tutorial2()'>Next</button></div>";
+    container.innerHTML= "<div class='bigBlock'><div>This is the <span style='color: #FF3131'>playground</span>. Yellow disks represents coins. You are the blue cell. You can move around the maze by pressing <span style='color: #00BF63'>those buttons</span> on the screen.</div><img src='img/maze.png' width='600px'></img> </br></br><button class='nextButton' onclick='tutorial2()'>Next</button></div>";
 }
 
 function tutorial2(){
@@ -46,7 +46,12 @@ function tutorial3b(){
         for(j = 1;j <=18;j++){
             cell = document.getElementById("cell_" + j + "_" + i);
             if(cell.getAttribute("isCoin")=="true"){
-                cell.style.backgroundColor = colors.coinColor;
+                // cell.style.backgroundColor = colors.coinColor;
+                cell.style.backgroundColor = colors.mazeColor;
+                cell.innerHTML = `<div id='coin_${j}_${i}' class='coin'></div>`;
+                coin = document.getElementById(`coin_${j}_${i}`);
+                coin.style.backgroundColor = colors.coinColor;
+                coin.style.borderColor = colors.coinColor;
             }
         } 
     }
@@ -106,7 +111,7 @@ function tutorial13(){
 
 function tutorial14(){
     var container = document.getElementById("main_container");
-    container.innerHTML= "<div class='bigBlock'><div>Based on this scoring mechanisms, you can earn an added bonus of 1 euro for each game where the team score surpasses 100 points. Alternatively, you can earn an added bonus of 25 cents for each game where your individual score surpasses 15 points. So consider your strategy carefully and decide whether you would like to work toward maximizing your individual score or the team score and potentially gaining an added bonus.</div></br></br><button class='nextButton' onclick='tutorial15()'>Next</button></div>";
+    container.innerHTML= "<div class='bigBlock'><div>Based on this scoring mechanisms, you can earn an added bonus of 1 euro for each game where the team score surpasses 60 points. Alternatively, you can earn an added bonus of 25 cents for each game where your individual score surpasses 10 points. So consider your strategy carefully and decide whether you would like to work toward maximizing your individual score or the team score and potentially gaining an added bonus.</div></br></br><button class='nextButton' onclick='tutorial15()'>Next</button></div>";
 }
 
 function tutorial15(){ // QUESTION 2.1
@@ -126,7 +131,7 @@ function tutorial17(){ //QUESTION 2.3
 
 function tutorial18(){
     var container = document.getElementById("main_container");
-    container.innerHTML= "<div class='bigBlock'><div>Congratulations! You finished the tutorial.</div></br></br><button class='nextButton' onclick='startExperiment2()'>Let's go to the games!</button></div>";
+    container.innerHTML= "<div class='bigBlock'><div>Congratulations! You finished the tutorial.</div></br></br><button class='nextButton' onclick='startExperiment2()'>Let's go to the game!</button></div>";
 }
 
 //MANAGING TUTORIAL QUESTIONS AND ANSWERS =============================================================================
