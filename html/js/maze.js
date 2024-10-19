@@ -1,11 +1,11 @@
-const roundPerGame = 6; //needs to be below or equal to 6; can be less but the no fail/fail rounds will stay in the same order: no fail, no fail, fail, fail, fail, no fail
+const roundPerGame = 1; //needs to be below or equal to 6; can be less but the no fail/fail rounds will stay in the same order: no fail, no fail, fail, fail, fail, no fail
 const gamePerExperiment = 1; //works for 1 or 2 only
 
 const randomSpawn = false; //if true, the point from which participant start each round will be randomized; if false, it will be fixed to the middle of the maze
 const multipleFailTypes = false; // do participant go through both failure types or only one
 const randomMazeGen = false; //if true, maze will be randomly generated ; however, the maze for the tutorial is always the same
 
-//if randomMazeGen, the following three constants can be changed; else, keep mazeWidth = 26; mazeHeight = 18; nbCoins = 15;
+//if randomMazeGen, the following three constants can be changed; else, mazeWidth = 26; mazeHeight = 18; nbCoins = 15;
 const mazeWidth = 26;
 const mazeHeight = 18;
 const nbCoins = 15;
@@ -13,7 +13,12 @@ const nbCoins = 15;
 var tutorialMode;
 
 const strats = ["denial", "compensation", "apology"]; //one of those is chosen just once
-var stratType = strats[randomIndex(strats.length)];
+try{
+    var stratType = strats[randomIndex(strats.length)];
+}catch(err){
+    document.getElementById("main_container").innerHTML = err.message;
+}
+
 var failures, failType;
 switch (multipleFailTypes){
     case true:
@@ -27,7 +32,9 @@ switch (multipleFailTypes){
 var pepperMsgs, pepperBehaviour;
 var pepperNormalMsg = "Great job! Let us keep working as a team.";
 var pepperInitMsg = "Let us work as a team and maximize our team score!";
+
 function setPepperMsgs(strat,fail){
+    // alert("in setPepperMsgs from maze.js");
     switch (fail){
         case "morality":
             switch (strat) {
@@ -97,6 +104,7 @@ function setPepperMsgs(strat,fail){
 }
 
 function pepperMsgInit(){
+    // alert("in pepperMsgInit from maze.js");
     var container = document.getElementById("main_container");
     container.innerHTML = `<div class="envelope" onclick='showPepperInitMsg()'><div class="seal-flap"></div></div><div>You have a message from Pepper! Click on the envelope to see it.</div>`;
 }
@@ -106,20 +114,18 @@ function showPepperInitMsg(){
     container.style.flexDirection = 'column';
    
     container.innerHTML = `<div class="envelope" onclick="init()"><div class='insideEnvelope'>${pepperInitMsg}</div></div><div>Click on the envelope to start the game.</div>`;
-    // document.getElementById('velopeinit').style.alignContent = 'center';
-    // document.getElementById('velopeinit').style.justifyContent = 'center';
 }
 
 function pepperMessage(){
     var message;
-    switch(currentRound){
-        case 1,2,6:
-            message = pepperNormalMsg;
-            break;
-        case 3,4,5:
-            message = pepperMsgs[randomIndex(pepperMsgs.length)];
-            break;
+    if(currentRound < 3 || currentRound==6){
+        console.log("in pepperMessage case 1 2 6");
+        message = pepperNormalMsg;
+    }else{
+        console.log("in pepperMessage case 3 4 5");
+        message = pepperMsgs[randomIndex(pepperMsgs.length)];
     }
+    console.log(message);
 
     var container = document.getElementById("main_container");
     container.innerHTML = `<div class="envelope" onclick='showPepperMessage("${message}")'><div class="seal-flap"></div></div> <div>You have a message from Pepper! Click on the envelope to see it.</div>`;
@@ -155,22 +161,22 @@ const maps = [
 ];
 var mapsOrder = shuffleArray(maps);
 var mapsIndex = 0;
-// console.log(mapsOrder);
+console.log(mapsOrder);
 
-const dbIDWords = ["apple", "avocado", "basil", "berry", "biscuit", "brownie", "caramel", "cheese", "crepe", "coffee", "chicken", "dinner", "drink", "egg", "food", "freezer", "fish", "granola", "grape", "honey", "jelly", "kiwi", "kettle", "lunch", "lettuce", "melon", "milk", "nectar", "olive", "oven", "oyster", "pasta", "plate", "potato", "popcorn", "pumpkin", "radish", "rice", "recipe", "raisin", "salmon", "spicy", "soda", "sugar", "tea", "vanilla", "vinegar", "waffle", "yam", "water"];
+// const dbIDWords = ["apple", "avocado", "basil", "berry", "biscuit", "brownie", "caramel", "cheese", "crepe", "coffee", "chicken", "dinner", "drink", "egg", "food", "freezer", "fish", "granola", "grape", "honey", "jelly", "kiwi", "kettle", "lunch", "lettuce", "melon", "milk", "nectar", "olive", "oven", "oyster", "pasta", "plate", "potato", "popcorn", "pumpkin", "radish", "rice", "recipe", "raisin", "salmon", "spicy", "soda", "sugar", "tea", "vanilla", "vinegar", "waffle", "yam", "water"];
 //another DB of 50 words: ["sample", "theory", "income", "judgment", "cookie", "highway", "bathroom", "estate", "drama", "wedding", "person", "patience", "basket", "girlfriend", "concept", "driver", "housing", "contract", "outcome", "problem", "context", "coffee", "product", "garbage", "fishing", "payment", "buyer", "shopping", "airport", "boyfriend", "power", "friendship", "safety", "county", "data", "storage", "language", "basis", "dinner", "topic", "success", "teaching", "system", "orange", "movie", "woman", "presence", "science", "climate", "sector"];
 
-var participantID = randomID(4,"false");
+// var participantID = randomID(4,"false");
 
 var timer;
-const ms = 0, sec = 15, min = 0; //fixes timer length for each round
+const ms = 0, sec = 2, min = 0; //fixes timer length for each round
 var millis, secs, minu;
 
 var teamScore =0, roundTeamScore=0, pepperIndivScore=0;
 var currentRound = 1;
 var currentGame = 1;
 
-var hist = "";//for each game: game, failType, humanIndiv, teamScore, totalCoinsGameHuman, pastChoices, EORquestionsRep, EOGquestionRep
+var hist = "";//for each game: game_number, failType, humanIndiv, teamScore, totalCoinsGameHuman, pastChoices, EORquestionsRep, EOGquestionRep
 
 var EORquestionsType = ["honesty", "perf"];
 var EORquestionsRep = [], EOGquestionsRep =[]; // for eor : [round, "perf" or "honesty", rating] for each round, twice, for eog : [game, rating]
@@ -188,6 +194,8 @@ var human = {
 
 //TIMER =========================================================================================================
 function timerManager() {
+    // alert("in timerManager");
+    // try{
     if(millis!=0){
          millis--;
     }
@@ -212,9 +220,13 @@ function timerManager() {
 
     var txt= `${minute}:${seconds}:${milli}`;
     timer.innerHTML =txt;
+    // }catch(err){
+    //     document.getElementById("main_container").innerHTML = err.message;
+    // }
 };
 
 function startTimer(){
+    // alert("in startTimer");
     timer =  document.getElementById("timer_container");
 
     millis = ms;
@@ -228,7 +240,11 @@ function startTimer(){
     timer.innerHTML = `${minu}:${secs}:${millis}`;
     console.log(timer);
 
+    // try{
     time = setInterval(timerManager,10);
+    // }catch(err){
+    //     document.getElementById("main_container").innerHTML = err.message;
+    // }
 }
 
 function stopTimer(){
@@ -296,8 +312,8 @@ function pickCoin(who){
     // alert("pickCoin: start");
     if(tutorialMode){ //in the tutorial, collecting one coin is the end of the round; calls to the next step of the tutorial
         // alert("pickCoin: if tuto");
-        console.log("in pickcoin tuto true" + tutorialMode);
-        tutorial4();
+        // endOfRound(); //à enlever après les tests
+        tutorial4(); //le remettre, c'est pour les tests vu que le timer fonctionne toujours pas
     }else{
         // alert("pickCoin: in else");
         who.tempCoinsFound++;
@@ -322,27 +338,58 @@ document.addEventListener("keydown", eventKeyHandlers);
 
 //GAME FUNCTIONS ==============================================================================
 function startExperiment(){
-    tutorialMode = true;
+    // alert("in startExperiment from maze.js");
+    try{
+        tutorialMode = true;
 
-    var container = document.getElementById("main_container");
-    container.innerHTML="<div><h1>Welcome!</h1></div><div style='margin: 0 50px;'>Meet Pepper, your teammate for the experiment.</br></br><div>Before starting playing, you will go through a tutorial to understand how the game works, how scores are calculated and how to gain bonuses.</div></div><div><button id='tutorial' onclick='tutorial1()'>Let's go!</button></div>";
-}
-
-function startExperiment2(){
-    tutorialMode = false;
-
-    var container = document.getElementById("main_container");
-    if(gamePerExperiment==2){ //and roundPerGame == 5
-        container.innerHTML="<div style='margin: 0 50px;'>As seen in the tutorial, you are going to play two five-round games with Pepper, each game being independant to the other. They consist in exploring a maze and collecting coins. Although you will not be able to see what Pepper is doing, and Pepper will not have access to what you are doing, you will be working towards a same goal: maximizing your team score. <br> </div><div><button id='launchGame' onclick='startGame()'>Launch Game</button></div>";
-    }
-    if(gamePerExperiment==1){
-        container.innerHTML="<div style='margin: 0 50px;'>As seen in the tutorial, you are going to play a six-round game with Pepper. It consists in exploring a maze and collecting coins. Although you will not be able to see what Pepper is doing, and Pepper will not have access to what you are doing, you will be working towards a same goal: maximizing your team score. <br> </div><div><button id='launchGame' onclick='startGame()'>Launch Game</button></div>";
+        var container = document.getElementById("main_container");
+        container.innerHTML="<div><h1>Welcome!</h1></div><div style='margin: 0 50px;'>Meet Pepper, your teammate for the experiment.</br></br><div>Before starting playing, you will go through a tutorial to understand how the game works, how scores are calculated and how to gain bonuses.</div></div><div><button id='tutorial' onclick='startExperiment2()'>Let's go! BOUH</button></div>"; //tutorial1()
+    }catch(err){
+        document.getElementById("main_container").innerHTML = err.message;
     }
     
 }
 
+// function clickStartExpButton(){
+//     alert("in clickStartExpButton from maze.js");
+//     document.getElementById("main_container").innerHTML = "you clicked on the button!";
+//     try{ 
+//         startExperiment2(); 
+//     }
+//     catch(err){
+//         document.getElementById("main_container").innerHTML = err.message;
+//     }
+// }
+
+// document.getElementById("tutorial").addEventListener("click", clickStartExpButton);
+
+function startExperiment2(){
+    // alert("in startExperiment2 from maze.js");
+    // try{
+        tutorialMode = false; //true for the tests, false after the tests !!!
+
+        var container = document.getElementById("main_container");
+    // }catch(err){
+    //     document.getElementById("main_container").innerHTML = err.message;
+    // }
+    // try{
+        if(gamePerExperiment==2){ //and roundPerGame == 5
+            container.innerHTML="<div style='margin: 0 50px;'>As seen in the tutorial, you are going to play two five-round games with Pepper, each game being independant to the other. They consist in exploring a maze and collecting coins. Although you will not be able to see what Pepper is doing, and Pepper will not have access to what you are doing, you will be working towards a same goal: maximizing your team score. <br> </div><div><button id='launchGame' onclick='startGame()'>Launch Game</button></div>";
+        }
+        if(gamePerExperiment==1){
+            container.innerHTML="<div style='margin: 0 50px;'>As seen in the tutorial, you are going to play a six-round game with Pepper. It consists in exploring a maze and collecting coins. Although you will not be able to see what Pepper is doing, and Pepper will not have access to what you are doing, you will be working towards a same goal: maximizing your team score. <br> </div><div><button id='launchGame' onclick='startGame()'>Launch Game</button></div>";
+        }
+    // }catch(err){
+    //     document.getElementById("main_container").innerHTML = err.message;
+    // }
+    
+}
+
 function startGame(){
+    // alert("in startGame from maze.js");
+    
     if(currentRound==1){
+        // alert("in startGame from maze.js, if currentRound");
         if(multipleFailTypes){
             failType = failures[currentGame-1];
         }
@@ -350,11 +397,14 @@ function startGame(){
         console.log("stratType= " +stratType + "; failtype= " + failType + "; failures= " + failures);
         pepperMsgInit();
     }else{
+        // alert("in startGame from maze.js, else");
         init();
     }
+    // alert("in startGame from maze.js, after if/else");
 }
 
 function init() {
+    // alert("in init of maze.js");
     var container = document.getElementById("main_container");
     container.style.flexFlow = 'column wrap';
     container.innerHTML=`<div class='row1' style = 'flex-direction: row;'><div id='tempScore_container'>Coins collected this round = 0</div><div id='round_container'>Round ${currentRound}/${roundPerGame}</div><div id='timer_container' class='timer'>${min}:${sec}:${ms}</div></div><div class='row2' style = 'flex-direction: row;'><button class='moveButton' onclick='moveUp(human)'><span>&#8593;</span></button></div> <div class='row3' style = 'flex-direction: row;'><button class='moveButton' onclick='moveLeft(human)'><span>&#8592;</span></button><div id='maze_container' class = 'maze_container'></div><button onclick='moveRight(human)' class='moveButton'><span>&#8594;</span></button></div><div class='row4' style = 'flex-direction: row;'><button onclick='moveDown(human)' class='moveButton'><span>&#8595;</span></button></div>`;
@@ -367,11 +417,14 @@ function init() {
 }
 
 function launchRound(){
+    // alert("in launchRound of maze.js");
     if(randomMazeGen){
+        // alert("in launchRound of maze.js, if randomMazeGen");
         baseMaze();
         addCells();
         addCoins();
     }else{
+        // alert("in launchRound of maze.js, if !randomMazeGen");
         var center = document.getElementById("maze_container");
 
         var mazeBoxInfo = center.getBoundingClientRect();
@@ -852,26 +905,26 @@ function repEOG7(){
 }
 
 function endGame(){
+    // alert("in endGame");
     hist = `${currentGame}, ${failType}, ${human.indivScore},${teamScore}, ${human.totalCoinsFound}, ${human.pastChoices},${EORquestionsRep},${EOGquestionsRep[currentGame-1]}`;
 
     //downloading all data on the computer, once every game
-    downloadData();
+    // downloadData();
 
     if(gamePerExperiment==2 && currentGame==1){
         //TODO: modify layout, style; scores are too little (bc p probably)
         var container = document.getElementById("main_container");
         container.innerHTML=`<div id='endGameTxt' class='row2'>You finished the first game. The scores are as followed: <div style='border: 1px solid white; padding: 0px 50px;' ><p>Your individual score: ${human.indivScore}</p><p>Pepper's individual score: ${pepperIndivScore}</p><p>Team score: ${teamScore} </p></div> </div> <div class = 'row3'>Before going to the second and last game, please move to the computer and fill in the corresponding questionnaire. Start by entering the four-word anonymiwed ID in the survey.</br></br><div id='participantID' style='padding: 5px 100px;'></div></br></br> Once done, you can start the next game by clicking on the button below. </div><div class='row4'><button id='nextRoundButton' onclick='nextGame()' class='choiceButton'>Next game</button></div>`;
 
-        var participant = document.getElementById("participantID");
-        participant.innerHTML = participantID;
-        participant.style.border = "1px #FFFFFF solid";
+        // var participant = document.getElementById("participantID");
+        // participant.innerHTML = participantID;
+        // participant.style.border = "1px #FFFFFF solid";
     }else{
         theEnd();
     }
 }
 
-function nextGame(){
-    //reset everything for the next game
+function nextGame(){ //reset everything for the next game
     currentRound=1;
     currentGame++;
     human.tempCoinsFound = 0;
@@ -895,7 +948,7 @@ function theEnd(){
 }
 
 function downloadData(){ 
-    //called twice per participant, one per game (so two lines per participants)
+    //called twice per participant, once per game (so two lines per participants)
 
     var xhr = new XMLHttpRequest();
     xhr.open("GET", `https://ics-pepper.science.uu.nl/html/post.php?id=${participantID}&strat=${stratType}&hist=${hist}`);
