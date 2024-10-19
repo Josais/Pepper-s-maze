@@ -1,3 +1,5 @@
+const isOnPepper = false;
+
 const roundPerGame = 1; //needs to be below or equal to 6; can be less but the no fail/fail rounds will stay in the same order: no fail, no fail, fail, fail, fail, no fail
 const gamePerExperiment = 1; //works for 1 or 2 only
 
@@ -106,14 +108,14 @@ function setPepperMsgs(strat,fail){
 function pepperMsgInit(){
     // alert("in pepperMsgInit from maze.js");
     var container = document.getElementById("main_container");
-    container.innerHTML = `<div class="envelope" onclick='showPepperInitMsg()'><div class="seal-flap"></div></div><div>You have a message from Pepper! Click on the envelope to see it.</div>`;
+    container.innerHTML = `<div class = 'row2'><div class="envelope" onclick='showPepperInitMsg()'><div class="seal-flap"></div></div></div><div class = 'row3'><div>You have a message from Pepper! Click on the envelope to see it.</div></div>`;
 }
 
 function showPepperInitMsg(){
     var container = document.getElementById("main_container");
     container.style.flexDirection = 'column';
    
-    container.innerHTML = `<div class="envelope" onclick="init()"><div class='insideEnvelope'>${pepperInitMsg}</div></div><div>Click on the envelope to start the game.</div>`;
+    container.innerHTML = `<div class = 'row2'><div class="envelope" onclick="init()"><div class='insideEnvelope'>${pepperInitMsg}</div></div></div><div class = 'row3'><div>Click on the envelope to start the game.</div></div>`;
 }
 
 function pepperMessage(){
@@ -128,13 +130,13 @@ function pepperMessage(){
     console.log(message);
 
     var container = document.getElementById("main_container");
-    container.innerHTML = `<div class="envelope" onclick='showPepperMessage("${message}")'><div class="seal-flap"></div></div> <div>You have a message from Pepper! Click on the envelope to see it.</div>`;
+    container.innerHTML = `<div class = 'row2'><div class="envelope" onclick='showPepperMessage("${message}")'><div class="seal-flap"></div></div></div> <div class = 'row3'><div>You have a message from Pepper! Click on the envelope to see it.</div></div>`;
 }
 
 function showPepperMessage(message){
     var container = document.getElementById("main_container");
     container.style.flexDirection = 'column';
-    container.innerHTML = `<div class="envelope" onclick="nextRound()"><div class='insideEnvelope'>${message}</div></div><div>Click on the envelope to go to the next round.</div>`;
+    container.innerHTML = `<div class = 'row2'><div class="envelope" onclick="nextRound()"><div class='insideEnvelope'>${message}</div></div></div><div class = 'row3'><div>Click on the envelope to go to the next round.</div></div>`;
 }
 
 const colors = {
@@ -343,7 +345,7 @@ function startExperiment(){
         tutorialMode = true;
 
         var container = document.getElementById("main_container");
-        container.innerHTML="<div><h1>Welcome!</h1></div><div style='margin: 0 50px;'>Meet Pepper, your teammate for the experiment.</br></br><div>Before starting playing, you will go through a tutorial to understand how the game works, how scores are calculated and how to gain bonuses.</div></div><div><button id='tutorial' onclick='startExperiment2()'>Let's go! BOUH</button></div>"; //tutorial1()
+        container.innerHTML="<div class='row2'><div><h1>Welcome!</h1></div><div style='margin: 0 50px;'>Meet Pepper, your teammate for the experiment.</br></br><div>Before starting playing, you will go through a tutorial to understand how the game works, how scores are calculated and how to gain bonuses.</div></div></div><div class='row3'><div><button id='tutorial' onclick='startExperiment2()'>Let's go! BOUH</button></div></div>"; //tutorial1()
     }catch(err){
         document.getElementById("main_container").innerHTML = err.message;
     }
@@ -943,8 +945,21 @@ function nextGame(){ //reset everything for the next game
 }
 
 function theEnd(){
+    var message1, message2;
+    if(gamePerExperiment==1){
+        message1 = "You finished the last round of the game.";
+    }if(gamePerExperiment==2){
+        message1 = "You finished the last game.";
+    }
+
+    if(isOnPepper){
+        message2 = "Please move to the computer to complete the final step of the survey.</div>";
+    }else{
+        message2 = "You will now be moved to the questionnaire.</div><div class='row3'><button id='toQuestionnaire' onclick='questionnaire()'>Start the questionnaire</button></div>";
+    }
+
     var container = document.getElementById("main_container");
-    container.innerHTML=`<div>You finished the last game. The scores are as followed: <div style='border: 1px solid white; padding: 0px 50px;' ><p>Your individual score: ${human.indivScore}</p><p>Pepper's individual score: ${pepperIndivScore}</p><p>Team score: ${teamScore} </p></div> </br></br>Please move to the computer to complete the final step of the survey.</div>`;
+    container.innerHTML=`<div class ='row2'>${message1} The scores are as followed: </br></br><div style='border: 1px solid white; padding: 0px 50px;' ><p>Your individual score: ${human.indivScore}</p><p>Pepper's individual score: ${pepperIndivScore}</p><p>Team score: ${teamScore} </p></div> </br></br>${message2}`;
 }
 
 function downloadData(){ 

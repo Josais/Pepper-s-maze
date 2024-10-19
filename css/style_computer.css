@@ -9,7 +9,6 @@ html, body{
     background-color: #000000;
     font-family:'Times New Roman', Times, serif;
     font-size: large;
-    /* bouh */
 }
 
 /* div{
@@ -38,7 +37,7 @@ div#main_container{
     flex-flow: column;
     align-items: center;
     justify-content: space-around;
-    width: auto;
+    width: 100%;
     height: auto;
 }
 
