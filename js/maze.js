@@ -335,7 +335,7 @@ function updateIndivScore(who, choice){
 }
 
 //EVENT LISTENER ===============================================================================
-window.addEventListener("load", startExperiment);
+// window.addEventListener("load", dispoTrust); //startExperiment
 document.addEventListener("keydown", eventKeyHandlers);
 
 //GAME FUNCTIONS ==============================================================================

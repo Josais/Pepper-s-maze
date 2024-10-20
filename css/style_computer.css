@@ -98,6 +98,10 @@ div#main_container{
     align-self: center;
 }
 
+.q_button{
+    width:100%;
+    height:100%;
+}
 
 
 button{
