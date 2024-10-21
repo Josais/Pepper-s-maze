@@ -21,16 +21,13 @@ try{
     document.getElementById("main_container").innerHTML = err.message;
 }
 
-var failures, failType;
-switch (multipleFailTypes){
-    case true:
-        failures = shuffleArray(["morality","performance"]);
-        break;
-    case false:
-        failures = ["morality","performance"]; //one of those is chosen just once
-        failType = failures[randomIndex(failures.length)];
+var failures= failures = shuffleArray(["morality","performance"]);
+var failType;
+if(!multipleFailTypes){
+    failType = failures[randomIndex(failures.length)];
 }
 
+//MANAGEMENT OF PEPPER'S MESSAGES AND BEHAVIOUR IN THE GAME ==========================================================================================================
 var pepperMsgs, pepperBehaviour;
 var pepperNormalMsg = "Great job! Let us keep working as a team.";
 var pepperInitMsg = "Let us work as a team and maximize our team score!";
@@ -139,6 +136,7 @@ function showPepperMessage(message){
     container.innerHTML = `<div class = 'row2'><div class="envelope" onclick="nextRound()"><div class='insideEnvelope'>${message}</div></div></div><div class = 'row3'><div>Click on the envelope to go to the next round.</div></div>`;
 }
 
+//MORE INITIALIZATION FUNCTIONS ===========================================================================================================
 const colors = {
     humanColor : '#0004ff',
     mazeColor : '#000000',
@@ -146,11 +144,7 @@ const colors = {
     blankMazeColor: '#ffffff',
     coinColor : 'gold'
 }
-
-const spawnPos = {row : 10, col : 14}; //used if randomSpawn
-const tutoMap = map9;
-// right now, there are 5 maps, one for each round. The array is shuffled and then maps are used one by one. Every game goes through all 5 maps once, in random order
-const maps = [
+const maps = [//there are 6 maps, currently, one for each round. The array is shuffled and then maps are used one by one. Every game goes through all 6 maps once, in random order. If there are only 5 rounds per game, then the last map is only used for the tutorial.
     map1, 
     map2,
     // map3, //TODO: finish
@@ -159,12 +153,15 @@ const maps = [
     map6,
     // map7, //TODO
     map8,
+    map9,
     // map10  //TODO: finish
 ];
 var mapsOrder = shuffleArray(maps);
+const tutoMap = mapsOrder[5]; //last map
 var mapsIndex = 0;
-console.log(mapsOrder);
+// console.log(mapsOrder);
 
+//the participant ID is needed in case the questionnaire and the game are not done on the same machine
 // const dbIDWords = ["apple", "avocado", "basil", "berry", "biscuit", "brownie", "caramel", "cheese", "crepe", "coffee", "chicken", "dinner", "drink", "egg", "food", "freezer", "fish", "granola", "grape", "honey", "jelly", "kiwi", "kettle", "lunch", "lettuce", "melon", "milk", "nectar", "olive", "oven", "oyster", "pasta", "plate", "potato", "popcorn", "pumpkin", "radish", "rice", "recipe", "raisin", "salmon", "spicy", "soda", "sugar", "tea", "vanilla", "vinegar", "waffle", "yam", "water"];
 //another DB of 50 words: ["sample", "theory", "income", "judgment", "cookie", "highway", "bathroom", "estate", "drama", "wedding", "person", "patience", "basket", "girlfriend", "concept", "driver", "housing", "contract", "outcome", "problem", "context", "coffee", "product", "garbage", "fishing", "payment", "buyer", "shopping", "airport", "boyfriend", "power", "friendship", "safety", "county", "data", "storage", "language", "basis", "dinner", "topic", "success", "teaching", "system", "orange", "movie", "woman", "presence", "science", "climate", "sector"];
 
@@ -182,17 +179,6 @@ var hist = "";//for each game: game_number, failType, humanIndiv, teamScore, tot
 
 var EORquestionsType = ["honesty", "perf"];
 var EORquestionsRep = [], EOGquestionsRep =[]; // for eor : [round, "perf" or "honesty", rating] for each round, twice, for eog : [game, rating]
-
-var humanCell;
-var human = {
-    x : 0,
-    y:0,
-    color: colors.humanColor,
-    tempCoinsFound : 0,
-    totalCoinsFound : 0,
-    indivScore : 0,
-    pastChoices : []
-}
 
 //TIMER =========================================================================================================
 function timerManager() {
@@ -254,6 +240,19 @@ function stopTimer(){
 }
 
 //HUMAN CHARACTER FUNCTIONS ===========================================================================
+const spawnPos = {row : 10, col : 14}; //used if randomSpawn
+
+var humanCell;
+var human = {
+    x : 0,
+    y:0,
+    color: colors.humanColor,
+    tempCoinsFound : 0,
+    totalCoinsFound : 0,
+    indivScore : 0,
+    pastChoices : []
+}
+
 function spawn(){ 
     if(randomSpawn){
         human.x = randomIndex(mazeWidth) +1;
