@@ -6,7 +6,6 @@ const dispoTrustItems = {
     dt5: "It is easy for me to trust robots to do their job.",
     dt6: "I am likely to trust a robot even when I have little knowledge about it."
 };
-
 const rosas_mdmtItems= { 
     //MDMT-V2 subscales:
     //r: reliable / c: competent / e: ehtical  / t: transparent / b: benevolent
@@ -56,6 +55,7 @@ const rosas_mdmtItems= {
 };
 const rosas_mdmtOrder = shuffleArray(["r1","r2","r3","r4","c1","c2","c3","c4","e1","e2","e3","e4","t1","t2","t3","t4","b1","b2","b3","b4","w1","w2","w3","w4","w5","w6","d1","d2","d3","d4","d5","d6"]);
 
+const scale4 = ["gender", "rounds", "pepAlloc"];
 const scale5 = ["exp","study"];
 const scale7 = ["dt1","dt2","dt3","dt4","dt5","dt6","dt7","r1","r2","r3","r4","c1","c2","c3","c4","e1","e2","e3","e4","t1","t2","t3","t4","b1","b2","b3","b4","w1","w2","w3","w4","w5","w6","d1","d2","d3","d4","d5","d6"];
 
@@ -70,7 +70,7 @@ var rep_questionnaire = {
 
     //attention checks
     rounds: "",
-    pA : "",
+    pepAlloc : "",
 
     //MDMT-v2 scale ratings
     r1: "",
@@ -123,10 +123,11 @@ var rep_questionnaire = {
 
 var question_;
 
-
+// EVENT LISTENER =======================================================================================================
 window.addEventListener("load",  dispoTrust);
 
 
+//DISPOSITIONAL TRUST: before the game =================================================================================
 function dispoTrust(){
     var dtOrder = shuffleArray(["dt1","dt2","dt3","dt4","dt5","dt6"]);
     question_ = "How much do you find those statements to be true?";
@@ -172,7 +173,7 @@ function dispoTrust(){
                     col.style.width = "50%";
                 }
                 else{
-                    console.log(`dans dT function: button_${item}_${colIndex}`);
+                    // console.log(`dans dT function: button_${item}_${colIndex}`);
                     col.innerHTML=`<button class="q_button" id="button_${item}_${colIndex}" onclick="rep('${item}',${colIndex})"></button>`;//ex: button_dt1_1 for the button to "I usually trust robots until there is a reason not to." being rated with a one
                 }       
                 row.appendChild(col);
@@ -197,28 +198,116 @@ function confirmDT(){
     }
     if(cont){
         //nextfunction
-        rosas_mdmt(1,16);
+        howManyRounds();
         // alert("everything was good, I just need to add the next function");
     }
 }
 
+
+//ATTENTION CHECKS: just after the game ================================================================================
 function questionnaire(){
     //TODO: should explain the questionnaire a little bit maybe ? 
 }
 
 function howManyRounds(){
     question_ = "How many rounds were played in the game?";
-    //TODO
+    var choices_rounds = ["Deux (2)","Quatre (4)", "Six (6)", "Huit (8)"];
+
+    document.getElementById("main_container").innerHTML = `<div class='row2'>${question_}</div><div class='row3' id='table_dt'></div><div class='row4'><button id='confirm_howManyRounds' onclick='confirm_howManyRounds()'>Next</button></div>`;
+    
+    var rowIndex, colIndex;
+    
+    var table = document.createElement("table");
+    var tbody = document.createElement("tbody");
+
+    for(rowIndex=0; rowIndex<4; rowIndex++){
+        var row = document.createElement("tr");
+
+        for (colIndex = 0; colIndex < 2; colIndex++){
+            var col = document.createElement("td");
+            col.style.backgroundColor = colors.mazeColor;
+            col.style.border= '1px #FFFFFF solid';
+
+            if(colIndex==0){
+                col.innerHTML= choices_rounds[rowIndex];
+                col.style.width = "50%";
+            }
+            else{
+                col.innerHTML=`<button class="q_button" id="button_rounds_${rowIndex+1}" rounds="${choices_rounds[rowIndex]}" onclick="rep('rounds',${rowIndex+1})"></button>`;
+            }       
+            row.appendChild(col);
+        } 
+        tbody.appendChild(row);
+    }
+
+    table.appendChild(tbody);
+    
+    document.getElementById("table_dt").appendChild(table);
 }
+
+function confirm_howManyRounds(){
+    if(rep_questionnaire["rounds"]==""){
+        alert("One item or more is missing a rating.");
+    }
+    else{
+        //nextfunction
+        pepperAlloc();
+        // alert("everything was good, I just need to add the next function");
+    }
+}
+
 
 function pepperAlloc(){
     question_ = "What were Pepper's allocation decisions in the last two rounds of the game?";
-    //TODO
+    var choices_pepperAlloc = shuffleArray(["team/team","team/individual", "individual/team", "individual/individual"]);
+
+    document.getElementById("main_container").innerHTML = `<div class='row2'>${question_}</div><div class='row3' id='table_dt'></div><div class='row4'><button id='confirm_pepperAlloc' onclick='confirm_pepperAlloc()'>Next</button></div>`;
+    
+    var rowIndex, colIndex;
+    
+    var table = document.createElement("table");
+    var tbody = document.createElement("tbody");
+
+    for(rowIndex=0; rowIndex<4; rowIndex++){
+        var row = document.createElement("tr");
+
+        for (colIndex = 0; colIndex < 2; colIndex++){
+            var col = document.createElement("td");
+            col.style.backgroundColor = colors.mazeColor;
+            col.style.border= '1px #FFFFFF solid';
+
+            if(colIndex==0){
+                col.innerHTML= choices_pepperAlloc[rowIndex];
+                col.style.width = "50%";
+            }
+            else{
+                col.innerHTML=`<button class="q_button" id="button_pepAlloc_${rowIndex+1}" pepAlloc="${choices_pepperAlloc[rowIndex]}" onclick="rep('pepAlloc',${rowIndex+1})"></button>`;
+            }       
+            row.appendChild(col);
+        } 
+        tbody.appendChild(row);
+    }
+
+    table.appendChild(tbody);
+    
+    document.getElementById("table_dt").appendChild(table);
 }
 
+function confirm_pepperAlloc(){
+    if(rep_questionnaire["pepAlloc"]==""){
+        alert("One item or more is missing a rating.");
+    }
+    else{
+        //nextfunction
+        rosas_mdmt(1,16);
+        // alert("everything was good, I just need to add the next function");
+    }
+}
+
+//ROSAS and MDMT-v2 scales, after the attention checks ================================================================================
 function rosas_mdmt(page,itemsPerPage){ //there are 32 items in rosas_mdmtItems, which means that itemsPerPage can be equal to 1, 2, 4, 8, 16 or 32
     var first_item = (page - 1) *itemsPerPage;
-    console.log("first item in rosas mdmt " + first_item);
+    // console.log("first item in rosas mdmt " + first_item);
 
     question_ = "How much do you find Pepper to be [word]?";
     document.getElementById("main_container").innerHTML = `<div class='row2'>${question_}</div><div class='row3' id='table_dt'></div><div class='row4'><button id='confirm_rosas_mdmt${page}' onclick='confirm_rosas_mdmt(${page},${itemsPerPage})'>Next</button></div>`;
@@ -251,9 +340,7 @@ function rosas_mdmt(page,itemsPerPage){ //there are 32 items in rosas_mdmtItems,
 
         else{ //remaining rows have first the item, then 7 columns with a button in each for rating
             var i_item = first_item+rowIndex-1;
-            console.log("i_item " + i_item);
             var item = rosas_mdmtOrder[i_item];
-            console.log("item" + item);
 
             for (colIndex = 0; colIndex < 8; colIndex++){
                 var col = document.createElement("td");
@@ -265,7 +352,6 @@ function rosas_mdmt(page,itemsPerPage){ //there are 32 items in rosas_mdmtItems,
                     col.style.width = "50%";
                 }
                 else{
-                    console.log(`dans dT function: button_${item}_${colIndex}`);
                     col.innerHTML=`<button class="q_button" id="button_${item}_${colIndex}" onclick="rep('${item}',${colIndex})"></button>`;//ex: button_c3_6 for the button to "capable" being rated with a six
                 }       
                 row.appendChild(col);
@@ -297,16 +383,34 @@ function confirm_rosas_mdmt(page,itemsPerPage){
         }
         else{
             //nextfunction
-            demographics_gender();
+            demographics_age();
             // alert("everything was good, I just need to add the next function");
         }
         
     }
 }
 
+//DEMOGRAPHICS QUESTIONS at the end ================================================================================
 function demographics_age(){
     question_ = "How old are you?";
-    //open; but if I can't find out how to put an open text thingy out of a form, I'll just put some ranges and that's it
+
+    document.getElementById("main_container").innerHTML =`<div class='row2'><label for="age">${question_}</label></br><input type="text" id="age" name="age" size="10" /></div><div class='row3'><button id='confirm_demographics_age' onclick='confirm_demographics_age()'>Next</button></div>`;
+    //TODO: change size etc of the box
+}
+
+function confirm_demographics_age(){
+    rep_questionnaire["age"]= document.getElementById("age").value;
+
+    if(rep_questionnaire["age"]==""){
+        alert("One item or more is missing a rating.");
+    }
+    else{
+        //nextfunction
+        demographics_gender();
+        // alert("everything was good, I just need to add the next function");
+    }
+
+    
 }
 
 function demographics_gender(){
@@ -333,7 +437,6 @@ function demographics_gender(){
                 col.style.width = "50%";
             }
             else{
-                // console.log(`dans dT function: button_${item}_${colIndex}`);
                 col.innerHTML=`<button class="q_button" id="button_gender_${rowIndex+1}" gender="${choices_demo_gender[rowIndex]}" onclick="rep('gender',${rowIndex+1})"></button>`;
             }       
             row.appendChild(col);
@@ -381,7 +484,6 @@ function demographics_study(){
                 col.style.width = "50%";
             }
             else{
-                // console.log(`dans dT function: button_${item}_${colIndex}`);
                 col.innerHTML=`<button class="q_button" id="button_study_${rowIndex+1}" onclick="rep('study',${rowIndex+1})"></button>`;
             }       
             row.appendChild(col);
@@ -429,7 +531,6 @@ function demographics_exp(){
                 col.style.width = "50%";
             }
             else{
-                // console.log(`dans dT function: button_${item}_${colIndex}`);
                 col.innerHTML=`<button class="q_button" id="button_exp_${rowIndex+1}" onclick="rep('exp',${rowIndex+1})"></button>`;
             }       
             row.appendChild(col);
@@ -448,16 +549,30 @@ function confirm_demo_exp(){
     }
     else{
         //nextfunction
-        alert("everything was good, I just need to add the next function");
+        openFeedback();
+        // alert("everything was good, I just need to add the next function");
     }
 }
 
-function demographics_openFeedback(){
+//FEEDBACK IF PARTICIPANTS SO WANT, mark the end of the questionnaire for good ================================================================================
+function openFeedback(){
     question_ = "Do you have anything else that you want to add? You can write it down here.";
-    //open question; might need to erase it if I can't find how to put an open text thingy OUT of a form
+
+    document.getElementById("main_container").innerHTML =`<div class='row2'><label for="feedback">${question_}</label></br><input type="text" id="feedback" name="feedback" size="10" /></div><div class='row3'><button id='confirm_openFeedback' onclick='confirm_openFeedback()'>Next</button></div>`;
+    //TODO: change size etc of the box
 }
 
+function confirm_openFeedback(){
+    rep_questionnaire["openEndedQuestion"]= document.getElementById("feedback").value;
+    theEnd_ofthequestionnaire();
+}
 
+//THE END OF EVERYTHING ==================================================================================================================================
+function theEnd_ofthequestionnaire(){
+    //TODO
+}
+
+//RESPONSE MANAGEMENT FUNCTION ================================================================================================================================================================
 function rep(code_item,rating){
     var itt;
     if(scale7.includes(code_item)){
@@ -466,7 +581,7 @@ function rep(code_item,rating){
     if(scale5.includes(code_item)){
         itt=5;
     }
-    if(code_item=="gender"){
+    if(scale4.includes(code_item)){
         itt = 4;
     }
 
@@ -474,15 +589,17 @@ function rep(code_item,rating){
         if(i==rating){
             document.getElementById(`button_${code_item}_${i}`).style.backgroundColor = "#ff0000";
         }else{
-            console.log(`ds rep : button_${code_item}_${i}`);
+            // console.log(`ds rep : button_${code_item}_${i}`);
             document.getElementById(`button_${code_item}_${i}`).style.backgroundColor = "#222222";
         }
     }
 
-    if(code_item=="gender"){
-        rep_questionnaire[code_item] = document.getElementById(`button_${code_item}_${rating}`).getAttribute("gender");
-    }else{
+    if(scale4.includes(code_item)){
+        rep_questionnaire[code_item] = document.getElementById(`button_${code_item}_${rating}`).getAttribute(code_item);
+    }
+    else{
         rep_questionnaire[code_item] = rating;
     }
     console.log(rep_questionnaire);
 }
+

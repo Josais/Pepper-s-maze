@@ -334,7 +334,7 @@ function updateIndivScore(who, choice){
     console.log(who.pastChoices);
 }
 
-//EVENT LISTENER ===============================================================================
+//EVENT LISTENERS ===============================================================================
 // window.addEventListener("load", dispoTrust); //startExperiment
 document.addEventListener("keydown", eventKeyHandlers);
 
@@ -1170,27 +1170,27 @@ function addCoins(){
 //HUMAN CONTROLS ON KEYBOARD ===================================================================================
 function eventKeyHandlers(e) {
 	switch (e.keyCode) {
-			case 65: // a
+			// case 65: // a
 			case 37: // left arrow
-			case 72: // h
+			// case 72: // h
 				e.preventDefault();
 				moveLeft(human);
 				break;
-			case 87: // w
+			// case 87: // w
 			case 38: // up arrow
-			case 75: // k
+			// case 75: // k
 				e.preventDefault();
 				moveUp(human);
 				break;
-			case 68: // d
+			// case 68: // d
 			case 39: // right arrow
-			case 76: // l
+			// case 76: // l
 				e.preventDefault();
 				moveRight(human);
 				break;
-			case 83: // s
+			// case 83: // s
 			case 40: // down arrow
-			case 74: // j
+			// case 74: // j
 				e.preventDefault();
 				moveDown(human);
 				break;
