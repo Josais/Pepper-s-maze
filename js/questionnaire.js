@@ -124,7 +124,7 @@ var rep_questionnaire = {
 var question_;
 
 // EVENT LISTENER =======================================================================================================
-window.addEventListener("load",  dispoTrust);
+// window.addEventListener("load",  dispoTrust);
 
 
 //DISPOSITIONAL TRUST: before the game =================================================================================
@@ -198,17 +198,13 @@ function confirmDT(){
     }
     if(cont){
         //nextfunction
-        howManyRounds();
+        tutorial0();
         // alert("everything was good, I just need to add the next function");
     }
 }
 
 
 //ATTENTION CHECKS: just after the game ================================================================================
-function questionnaire(){
-    //TODO: should explain the questionnaire a little bit maybe ? 
-}
-
 function howManyRounds(){
     question_ = "How many rounds were played in the game?";
     var choices_rounds = ["Deux (2)","Quatre (4)", "Six (6)", "Huit (8)"];
@@ -570,6 +566,8 @@ function confirm_openFeedback(){
 //THE END OF EVERYTHING ==================================================================================================================================
 function theEnd_ofthequestionnaire(){
     //TODO
+
+    document.getElementById("main_container").innerHTML = "";
 }
 
 //RESPONSE MANAGEMENT FUNCTION ================================================================================================================================================================

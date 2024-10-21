@@ -335,20 +335,23 @@ function updateIndivScore(who, choice){
 }
 
 //EVENT LISTENERS ===============================================================================
-// window.addEventListener("load", dispoTrust); //startExperiment
+window.addEventListener("load", startExperiment); //startExperiment
 document.addEventListener("keydown", eventKeyHandlers);
 
 //GAME FUNCTIONS ==============================================================================
 function startExperiment(){
     // alert("in startExperiment from maze.js");
-    try{
-        tutorialMode = true;
-
-        var container = document.getElementById("main_container");
-        container.innerHTML="<div class='row2'><div><h1>Welcome!</h1></div><div style='margin: 0 50px;'>Meet Pepper, your teammate for the experiment.</br></br><div>Before starting playing, you will go through a tutorial to understand how the game works, how scores are calculated and how to gain bonuses.</div></div></div><div class='row3'><div><button id='tutorial' onclick='startExperiment2()'>Let's go! BOUH</button></div></div>"; //tutorial1()
-    }catch(err){
-        document.getElementById("main_container").innerHTML = err.message;
+    // try{
+    tutorialMode = true;
+    var container = document.getElementById("main_container");
+    if(isOnPepper){
+        container.innerHTML="<div class='row2'><div><h1>Welcome!</h1></div><div style='margin: 0 50px;'>Meet Pepper, your teammate for the experiment.</br></br><div>Before starting playing, you will go through a tutorial to understand how the game works, how scores are calculated and how to gain bonuses.</div></div></div><div class='row3'><div><button id='tutorial' onclick='tutorial1()'>Let's go!</button></div></div>"; 
+    }else{
+        container.innerHTML="<div class='row2'><div><h1>Welcome!</h1></div><div style='margin: 0 50px;'>Meet Pepper, your teammate for the experiment.</br></br><div>Before anything else, you will need to fill in a very short first questionnaire. This will be followed by the tutorial, then the game, and finally the second part of the questionnaire. If confused, you can ask for help to the experimenter at any point during the experiment.</div></div></div><div class='row3'><div><button id='tutorial' onclick='dispoTrust()'>Let's go!</button></div></div>"; //tutorial1()
     }
+    // }catch(err){
+    //     document.getElementById("main_container").innerHTML = err.message;
+    // }
     
 }
 
@@ -955,7 +958,7 @@ function theEnd(){
     if(isOnPepper){
         message2 = "Please move to the computer to complete the final step of the survey.</div>";
     }else{
-        message2 = "You will now be moved to the questionnaire.</div><div class='row3'><button id='toQuestionnaire' onclick='questionnaire()'>Start the questionnaire</button></div>";
+        message2 = "You will now move to the second part of the questionnaire.</div><div class='row3'><button id='toQuestionnaire' onclick='howManyRounds()'>Start the questionnaire</button></div>";
     }
 
     var container = document.getElementById("main_container");
