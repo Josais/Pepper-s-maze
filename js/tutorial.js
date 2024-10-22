@@ -26,7 +26,7 @@ function tutorial2(){
 
 function tutorial2b(){
     var container = document.getElementById("main_container");
-    container.innerHTML= "<div class='bigBlock'><div>You will be moved to a very short round of the searching game. You will be able to move around the maze using the touch buttons. The round will stop as soon as you have collected your first coin.</div></br></br><button class='nextButton' onclick='tutorial3()'>Let's go!</button></div>";
+    container.innerHTML= "<div class='bigBlock'><div>You will now play a very short round of the searching game. The round will stop as soon as you have collected your first coin.</div></br></br><button class='nextButton' onclick='tutorial3()'>Let's go!</button></div>";
 }
 
 function tutorial3(){
@@ -77,7 +77,7 @@ function tutorial4(){
 
 function tutorial5(){
     var container = document.getElementById("main_container");
-    container.innerHTML= "<div class='bigBlock'><div>In this search game, you will not be alone. You will be playing alongside Pepper, an autonomous robot. The robot will move independantly in a different maze, and will gain its own score in each round, which will be separeted from yours. You cannot see the robot, nor can you control its movements. You can only decide whether to collaborate or not with it.</div></br></br><button class='nextButton' onclick='tutorial6()'>Next</button></div>";
+    container.innerHTML= "<div class='bigBlock'><div>In this search game, you will not be alone. You will be playing alongside Pepper, an autonomous robot. The robot will move independantly in a different maze, and will gain its own score in each round, which will be separated from yours. You cannot see the robot, nor can you control its movements. You can only decide whether to collaborate or not with it.</div></br></br><button class='nextButton' onclick='tutorial6()'>Next</button></div>";
 }
 
 function tutorial6(){

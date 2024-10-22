@@ -334,38 +334,20 @@ function updateIndivScore(who, choice){
 }
 
 //EVENT LISTENERS ===============================================================================
-window.addEventListener("load", startExperiment); //startExperiment
+// window.addEventListener("load", openFeedback); //showConsentForm
 document.addEventListener("keydown", eventKeyHandlers);
 
 //GAME FUNCTIONS ==============================================================================
 function startExperiment(){
-    // alert("in startExperiment from maze.js");
-    // try{
     tutorialMode = true;
     var container = document.getElementById("main_container");
     if(isOnPepper){
         container.innerHTML="<div class='row2'><div><h1>Welcome!</h1></div><div style='margin: 0 50px;'>Meet Pepper, your teammate for the experiment.</br></br><div>Before starting playing, you will go through a tutorial to understand how the game works, how scores are calculated and how to gain bonuses.</div></div></div><div class='row3'><div><button id='tutorial' onclick='tutorial1()'>Let's go!</button></div></div>"; 
     }else{
-        container.innerHTML="<div class='row2'><div><h1>Welcome!</h1></div><div style='margin: 0 50px;'>Meet Pepper, your teammate for the experiment.</br></br><div>Before anything else, you will need to fill in a very short first questionnaire. This will be followed by the tutorial, then the game, and finally the second part of the questionnaire. If confused, you can ask for help to the experimenter at any point during the experiment.</div></div></div><div class='row3'><div><button id='tutorial' onclick='dispoTrust()'>Let's go!</button></div></div>"; //tutorial1()
+        container.innerHTML="<div class='row2'><div><h1>Welcome!</h1></div><div style='margin: 0 50px;'>Meet Pepper, your teammate for the experiment.</br></br><div>Before anything else, you will need to fill in a very short first questionnaire. This will be followed by the tutorial, then the game, and finally the second part of the questionnaire. If confused, you can ask for help to the experimenter at any point during the experiment.</div></div></div><div class='row3'><div><button id='tutorial' onclick='dispoTrust()'>Let's go!</button></div></div>";
     }
-    // }catch(err){
-    //     document.getElementById("main_container").innerHTML = err.message;
-    // }
     
 }
-
-// function clickStartExpButton(){
-//     alert("in clickStartExpButton from maze.js");
-//     document.getElementById("main_container").innerHTML = "you clicked on the button!";
-//     try{ 
-//         startExperiment2(); 
-//     }
-//     catch(err){
-//         document.getElementById("main_container").innerHTML = err.message;
-//     }
-// }
-
-// document.getElementById("tutorial").addEventListener("click", clickStartExpButton);
 
 function startExperiment2(){
     // alert("in startExperiment2 from maze.js");
@@ -381,7 +363,7 @@ function startExperiment2(){
             container.innerHTML="<div style='margin: 0 50px;'>As seen in the tutorial, you are going to play two five-round games with Pepper, each game being independant to the other. They consist in exploring a maze and collecting coins. Although you will not be able to see what Pepper is doing, and Pepper will not have access to what you are doing, you will be working towards a same goal: maximizing your team score. <br> </div><div><button id='launchGame' onclick='startGame()'>Launch Game</button></div>";
         }
         if(gamePerExperiment==1){
-            container.innerHTML="<div style='margin: 0 50px;'>As seen in the tutorial, you are going to play a six-round game with Pepper. It consists in exploring a maze and collecting coins. Although you will not be able to see what Pepper is doing, and Pepper will not have access to what you are doing, you will be working towards a same goal: maximizing your team score. <br> </div><div><button id='launchGame' onclick='startGame()'>Launch Game</button></div>";
+            container.innerHTML="<div style='margin: 0 50px;'>You are going to play a six-round game with Pepper. It consists in exploring a maze and collecting coins. Although you will not be able to see what Pepper is doing, and Pepper will not have access to what you are doing, you will be working towards a same goal: maximizing your team score. <br> </div><div><button id='launchGame' onclick='startGame()'>Launch Game</button></div>";
         }
     // }catch(err){
     //     document.getElementById("main_container").innerHTML = err.message;

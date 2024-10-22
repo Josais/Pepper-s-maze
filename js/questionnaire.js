@@ -552,12 +552,30 @@ function confirm_demo_exp(){
 
 //FEEDBACK IF PARTICIPANTS SO WANT, mark the end of the questionnaire for good ================================================================================
 function openFeedback(){
-    question_ = "Do you have anything else that you want to add? You can write it down here.";
+    question_ = "Do you want to add anything else? You can write it down here.";
 
-    document.getElementById("main_container").innerHTML =`<div class='row2'><label for="feedback">${question_}</label></br><input type="text" id="feedback" name="feedback" size="10" /></div><div class='row3'><button id='confirm_openFeedback' onclick='confirm_openFeedback()'>Next</button></div>`;
+    // document.getElementById("main_container").innerHTML =`<div class='row2'><label for="feedback">${question_}</label></br><input type="text" id="feedback" name="feedback" size="10" /></div><div class='row3'><button id='confirm_openFeedback' onclick='confirm_openFeedback()'>Next</button></div>`;
+    // //TODO: change size etc of the box
+    // var feedback = document.getElementById("feedback");
+    // feedback.style.width = "70%";
+    // feedback.style.height = "300px";
+    // feedback.style.boxSizing = "border-box";
+    // feedback.style.border = "2px solid #ccc";
+    // feedback.style.borderRadius = "4px";
+    // feedback.style.resize = "none";
+    // feedback.style.padding = "12px 20px";
+
+    document.getElementById("main_container").innerHTML =`<div class='row2'></br></br><textarea id="feedback">${question_}</textarea></div><div class='row3'><button id='confirm_openFeedback' onclick='confirm_openFeedback()'>Next</button></div>`;
     //TODO: change size etc of the box
+    var feedback = document.getElementById("feedback");
+    feedback.style.width = "70%";
+    feedback.style.height = "200px";
+    feedback.style.borderRadius = "4px";
+    feedback.style.resize = "none";
+    feedback.style.padding = "12px 20px";
+   
 }
-
+window.addEventListener("load", openFeedback);
 function confirm_openFeedback(){
     rep_questionnaire["openEndedQuestion"]= document.getElementById("feedback").value;
     theEnd_ofthequestionnaire();
