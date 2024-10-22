@@ -103,6 +103,11 @@ div#main_container{
     height:100%;
 }
 
+.consent_button{
+    width:50%;
+    height:100%;
+}
+
 
 button{
     width: 200px;
