@@ -132,7 +132,7 @@ function dispoTrust(){
     var dtOrder = shuffleArray(["dt1","dt2","dt3","dt4","dt5","dt6"]);
     question_ = "How much do you find those statements to be true?";
 
-    document.getElementById("main_container").innerHTML = `<div class='row2'>${question_}</div><div class='row3' id='table_dt'></div><div class='row4'><button id='confirmDT' onclick='confirmDT()'>Next</button></div>`;
+    document.getElementById("main_container").innerHTML = `<div class='row2' style="font-size:40px;">${question_}</div><div class='row3' id='table_dt'></div><div class='row4'><button id='confirmDT' onclick='confirmDT()'>Next</button></div>`;
     
     var rowIndex, colIndex;
     
@@ -390,8 +390,7 @@ function confirm_rosas_mdmt(page,itemsPerPage){
 function demographics_age(){
     question_ = "How old are you?";
 
-    document.getElementById("main_container").innerHTML =`<div class='row2'><label for="age">${question_}</label></br><input type="text" id="age" name="age" size="10" /></div><div class='row3'><button id='confirm_demographics_age' onclick='confirm_demographics_age()'>Next</button></div>`;
-    //TODO: change size etc of the box
+    document.getElementById("main_container").innerHTML =`<div class='row2'><label for="age" style="font-size:40px;">${question_}</label></br><input type="text" id="age" name="age" size="10" style="font-size:40px; width:30% ; height:60px; padding: 20px 10px; text-align:center;"/></div><div class='row3'><button id='confirm_demographics_age' onclick='confirm_demographics_age()'>Next</button></div>`;
 }
 
 function confirm_demographics_age(){
@@ -413,7 +412,7 @@ function demographics_gender(){
     question_ = "How do you identify?";
     var choices_demo_gender = shuffleArray(["Woman","Man","Nonbinary"]).concat(["Prefers not to say"]);
 
-    document.getElementById("main_container").innerHTML = `<div class='row2'>${question_}</div><div class='row3' id='table_dt'></div><div class='row4'><button id='confirm_demo_gender' onclick='confirm_demo_gender()'>Next</button></div>`;
+    document.getElementById("main_container").innerHTML = `<div class='row2' style="font-size:40px;">${question_}</div><div class='row3' id='table_dt'></div><div class='row4'><button id='confirm_demo_gender' onclick='confirm_demo_gender()'>Next</button></div>`;
     
     var rowIndex, colIndex;
     
@@ -431,6 +430,7 @@ function demographics_gender(){
             if(colIndex==0){
                 col.innerHTML= choices_demo_gender[rowIndex];
                 col.style.width = "50%";
+                col.style.fontSize = "25px";
             }
             else{
                 col.innerHTML=`<button class="q_button" id="button_gender_${rowIndex+1}" gender="${choices_demo_gender[rowIndex]}" onclick="rep('gender',${rowIndex+1})"></button>`;
@@ -460,7 +460,7 @@ function demographics_study(){
     question_= "How much of your education and/or occupation is related to technology?";
     var ratings_demo_study = ["Not at all related", "A little bit related", "Moderately related", "Related", "Completely related"];
 
-    document.getElementById("main_container").innerHTML = `<div class='row2'>${question_}</div><div class='row3' id='table_dt'></div><div class='row4'><button id='confirm_demo_study' onclick='confirm_demo_study()'>Next</button></div>`;
+    document.getElementById("main_container").innerHTML = `<div class='row2' style="font-size:40px;">${question_}</div><div class='row3' id='table_dt'></div><div class='row4'><button id='confirm_demo_study' onclick='confirm_demo_study()'>Next</button></div>`;
     
     var rowIndex, colIndex;
     
@@ -478,6 +478,7 @@ function demographics_study(){
             if(colIndex==0){
                 col.innerHTML= ratings_demo_study[rowIndex];
                 col.style.width = "50%";
+                col.style.fontSize = "25px";
             }
             else{
                 col.innerHTML=`<button class="q_button" id="button_study_${rowIndex+1}" onclick="rep('study',${rowIndex+1})"></button>`;
@@ -507,7 +508,7 @@ function demographics_exp(){
     question_= "How much previous experience with robots do you have?";
     var ratings_demo_exp = ["Nothing at all", "I've seen some, but no interaction", "I've interacted with one under supervision (at an event, for example)", "I've worked with robots once", "I frequently interact or work with robots"];
 
-    document.getElementById("main_container").innerHTML = `<div class='row2'>${question_}</div><div class='row3' id='table_dt'></div><div class='row4'><button id='confirm_demo_exp' onclick='confirm_demo_exp()'>Next</button></div>`;
+    document.getElementById("main_container").innerHTML = `<div class='row2' style="font-size:40px;">${question_}</div><div class='row3' id='table_dt'></div><div class='row4'><button id='confirm_demo_exp' onclick='confirm_demo_exp()'>Next</button></div>`;
     
     var rowIndex, colIndex;
     
@@ -524,10 +525,13 @@ function demographics_exp(){
 
             if(colIndex==0){
                 col.innerHTML= ratings_demo_exp[rowIndex];
-                col.style.width = "50%";
+                // col.style.width = "50%";
+                col.style.width = "500px";
+                col.style.fontSize = "25px";
             }
             else{
-                col.innerHTML=`<button class="q_button" id="button_exp_${rowIndex+1}" onclick="rep('exp',${rowIndex+1})"></button>`;
+                col.innerHTML=`<button class="q_button" style="width:100px;" id="button_exp_${rowIndex+1}" onclick="rep('exp',${rowIndex+1})"></button>`;
+                col.style.width= "100px";
             }       
             row.appendChild(col);
         } 
@@ -555,7 +559,6 @@ function openFeedback(){
     question_ = "Do you want to add anything else? You can write it down here.";
 
     // document.getElementById("main_container").innerHTML =`<div class='row2'><label for="feedback">${question_}</label></br><input type="text" id="feedback" name="feedback" size="10" /></div><div class='row3'><button id='confirm_openFeedback' onclick='confirm_openFeedback()'>Next</button></div>`;
-    // //TODO: change size etc of the box
     // var feedback = document.getElementById("feedback");
     // feedback.style.width = "70%";
     // feedback.style.height = "300px";
@@ -566,7 +569,6 @@ function openFeedback(){
     // feedback.style.padding = "12px 20px";
 
     document.getElementById("main_container").innerHTML =`<div class='row2'></br></br><textarea id="feedback">${question_}</textarea></div><div class='row3'><button id='confirm_openFeedback' onclick='confirm_openFeedback()'>Next</button></div>`;
-    //TODO: change size etc of the box
     var feedback = document.getElementById("feedback");
     feedback.style.width = "70%";
     feedback.style.height = "200px";
@@ -575,7 +577,8 @@ function openFeedback(){
     feedback.style.padding = "12px 20px";
    
 }
-window.addEventListener("load", openFeedback);
+// window.addEventListener("load", demographics_exp);
+
 function confirm_openFeedback(){
     rep_questionnaire["openEndedQuestion"]= document.getElementById("feedback").value;
     theEnd_ofthequestionnaire();
