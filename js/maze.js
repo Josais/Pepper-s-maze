@@ -33,7 +33,6 @@ var pepperNormalMsg = "Great job! Let us keep working as a team.";
 var pepperInitMsg = "Let us work as a team and maximize our team score!";
 
 function setPepperMsgs(strat,fail){
-    // alert("in setPepperMsgs from maze.js");
     switch (fail){
         case "morality":
             switch (strat) {
@@ -103,7 +102,6 @@ function setPepperMsgs(strat,fail){
 }
 
 function pepperMsgInit(){
-    // alert("in pepperMsgInit from maze.js");
     var container = document.getElementById("main_container");
     container.innerHTML = `<div class = 'row2'><div class="envelope" onclick='showPepperInitMsg()'><div class="seal-flap"></div></div></div><div class = 'row3'><div>You have a message from Pepper! Click on the envelope to see it.</div></div>`;
 }
@@ -323,7 +321,7 @@ function updateIndivScore(who, choice){
 }
 
 //EVENT LISTENERS ===============================================================================
-window.addEventListener("load", showConsentForm); //showConsentForm
+// window.addEventListener("load", startExperiment2); //showConsentForm
 document.addEventListener("keydown", eventKeyHandlers);
 
 //GAME FUNCTIONS ==============================================================================
@@ -333,7 +331,7 @@ function startExperiment(){
     if(isOnPepper){
         container.innerHTML="<div class='row2'><div><h1>Welcome!</h1></div><div style='margin: 0 50px;'>Meet Pepper, your teammate for the experiment.</br></br><div>Before starting playing, you will go through a tutorial to understand how the game works, how scores are calculated and how to gain bonuses.</div></div></div><div class='row3'><div><button id='tutorial' onclick='tutorial1()'>Let's go!</button></div></div>"; 
     }else{
-        container.innerHTML="<div class='row2'><div><h1>Welcome!</h1></div><div style='margin: 0 50px;'>Meet Pepper, your teammate for the experiment.</br></br><div>Before anything else, you will need to fill in a very short first questionnaire. This will be followed by the tutorial, then the game, and finally the second part of the questionnaire. If confused, you can ask for help to the experimenter at any point during the experiment.</div></div></div><div class='row3'><div><button id='tutorial' onclick='dispoTrust()'>Let's go!</button></div></div>";
+        container.innerHTML="<div class='row2'><div><h1>Welcome!</h1></div><div style='margin: 0 50px;'>Meet Pepper, your teammate for the experiment.</br></br><div>Before anything else, you will need to fill in a very short first questionnaire. This will be followed by the tutorial, then the game, and finally the second part of the questionnaire. If confused, you can ask for help from the experimenter at any point during the experiment.</div></div></div><div class='row3'><div><button id='tutorial' onclick='dispoTrust()'>Let's go!</button></div></div>";
     }
     
 }
@@ -460,13 +458,13 @@ function resultsEndOfRound(){
     console.log("human choice: " + human.pastChoices[currentRound-1][0]);
 
     if(human.pastChoices[currentRound-1][0] == "team" && pepperBehaviour[currentRound-1].decision == "team"){ //both chose team
-        recapTxt += `<p>You picked ${human.tempCoinsFound} coin(s) in this round and added them to the team score.</p><p>The robot picked ${pepperBehaviour[currentRound-1].coins} in this round and added them to the team score.</p>`;
+        recapTxt += `<p>You picked ${human.tempCoinsFound} coin(s) in this round and added them to the team score.</p><p>The robot picked ${pepperBehaviour[currentRound-1].coins} coin(s) in this round and added them to the team score.</p>`;
     }else if(human.pastChoices[currentRound-1][0] == "team" && pepperBehaviour[currentRound-1].decision == "indiv"){ //pepper indiv, human team
-        recapTxt += `<p>You picked ${human.tempCoinsFound} coin(s) in this round and added them to the team score.</p><p>The robot picked ${pepperBehaviour[currentRound-1].coins} in this round and added them to its individual score.</p>`;
+        recapTxt += `<p>You picked ${human.tempCoinsFound} coin(s) in this round and added them to the team score.</p><p>The robot picked ${pepperBehaviour[currentRound-1].coins} coin(s) in this round and added them to its individual score.</p>`;
     }else if(human.pastChoices[currentRound-1][0] == "indiv" && pepperBehaviour[currentRound-1].decision == "team"){ //pepper team, human indiv
-        recapTxt += `<p>You picked ${human.tempCoinsFound} coin(s) in this round and added them to your indivudal score.</p><p>The robot picked ${pepperBehaviour[currentRound-1].coins} in this round and added them to the team score.</p>`;
+        recapTxt += `<p>You picked ${human.tempCoinsFound} coin(s) in this round and added them to your indivudal score.</p><p>The robot picked ${pepperBehaviour[currentRound-1].coins} coin(s) in this round and added them to the team score.</p>`;
     }else if(human.pastChoices[currentRound-1][0] == "indiv" && pepperBehaviour[currentRound-1].decision == "indiv"){ //both indiv
-        recapTxt += `<p>You picked ${human.tempCoinsFound} coin(s) in this round and added them to your individual score.</p><p>The robot picked ${pepperBehaviour[currentRound-1].coins} in this round and added them to its individual score.</p>`;
+        recapTxt += `<p>You picked ${human.tempCoinsFound} coin(s) in this round and added them to your individual score.</p><p>The robot picked ${pepperBehaviour[currentRound-1].coins} coin(s) in this round and added them to its individual score.</p>`;
     }
 
     if(human.pastChoices[currentRound-1][0] == "team" && pepperBehaviour[currentRound-1].decision == "team"){

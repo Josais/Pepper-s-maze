@@ -17,6 +17,8 @@ function showConsentForm(){
     var buttonsconsent = document.createElement("div");
     buttonsconsent.innerHTML = `<button class="consent_button" onclick="consent()">I consent to all of the above</button><button class="consent_button" onclick="dontconsent()">I do not consent</button>`;
     buttonsconsent.className = "row3";
+    buttonsconsent.style.flexDirection = "row";
+    // style = 'flex-direction: row;'
 
     container.appendChild(buttonsconsent);
 }

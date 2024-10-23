@@ -55,6 +55,8 @@ const rosas_mdmtItems= {
 };
 const rosas_mdmtOrder = shuffleArray(["r1","r2","r3","r4","c1","c2","c3","c4","e1","e2","e3","e4","t1","t2","t3","t4","b1","b2","b3","b4","w1","w2","w3","w4","w5","w6","d1","d2","d3","d4","d5","d6"]);
 
+var scale7_explained = '</br><div class ="scale7_explained">1 means not at all, and 7 means completely</div>';
+
 const scale4 = ["gender", "rounds", "pepAlloc"];
 const scale5 = ["exp","study"];
 const scale7 = ["dt1","dt2","dt3","dt4","dt5","dt6","dt7","r1","r2","r3","r4","c1","c2","c3","c4","e1","e2","e3","e4","t1","t2","t3","t4","b1","b2","b3","b4","w1","w2","w3","w4","w5","w6","d1","d2","d3","d4","d5","d6"];
@@ -124,7 +126,7 @@ var rep_questionnaire = {
 var question_;
 
 // EVENT LISTENER ==================================================================================================
-// window.addEventListener("load",  dispoTrust);
+window.addEventListener("load",  rosas_mdmt);
 
 
 //DISPOSITIONAL TRUST: before the game =================================================================================
@@ -132,7 +134,7 @@ function dispoTrust(){
     var dtOrder = shuffleArray(["dt1","dt2","dt3","dt4","dt5","dt6"]);
     question_ = "How much do you find those statements to be true?";
 
-    document.getElementById("main_container").innerHTML = `<div class='row2' style="font-size:35px;">${question_}</div><div class='row3' id='table_dt'></div><div class='row4'><button id='confirmDT' onclick='confirmDT()'>Next</button></div>`;
+    document.getElementById("main_container").innerHTML = `<div class='row2' style="font-size:35px;">${question_}${scale7_explained}</div><div class='row3' id='table_dt'></div><div class='row4'><button id='confirmDT' onclick='confirmDT()'>Next</button></div>`;
     
     var rowIndex, colIndex;
     
@@ -205,7 +207,7 @@ function confirmDT(){
 //ATTENTION CHECKS: just after the game ================================================================================
 function howManyRounds(){
     question_ = "How many rounds were played in the game?";
-    var choices_rounds = ["Deux (2)","Quatre (4)", "Six (6)", "Huit (8)"];
+    var choices_rounds = ["Two (2)","Four (4)", "Six (6)", "Eight (8)"];
 
     document.getElementById("main_container").innerHTML = `<div class='row2' style="font-size:35px;">${question_}</div><div class='row3' id='table_dt'></div><div class='row4'><button id='confirm_howManyRounds' onclick='confirm_howManyRounds()'>Next</button></div>`;
     
@@ -302,17 +304,20 @@ function rosas_mdmt(page,itemsPerPage){ //there are 32 items in rosas_mdmtItems,
     // console.log("first item in rosas mdmt " + first_item);
 
     question_ = "How much do you find Pepper to be [word]?";
-    document.getElementById("main_container").innerHTML = `<div class='row2'>${question_}</div><div class='row3' id='table_dt'></div><div class='row4'><button id='confirm_rosas_mdmt${page}' onclick='confirm_rosas_mdmt(${page},${itemsPerPage})'>Next</button></div>`;
+    document.getElementById("main_container").innerHTML = `<div class='row2' style="font-size:35px;">${question_}${scale7_explained}</div><div class='row3' id='table_dt'></div><div class='row4'><button id='confirm_rosas_mdmt${page}' onclick='confirm_rosas_mdmt(${page},${itemsPerPage})'>Next</button></div>`;
     
     var rowIndex, colIndex;
     
     var table = document.createElement("table");
     var tbody = document.createElement("tbody");
-
+    console.log("là");
+    try{
     for(rowIndex=0; rowIndex<=itemsPerPage; rowIndex++){
         var row = document.createElement("tr");
+        console.log("ici");
 
         if(rowIndex==0){ //first row is for showing ratings 1 to 7
+            console.log("row index0");
             for (colIndex = 0; colIndex < 8; colIndex++){
                 var col =document.createElement("td");
                 col.style.backgroundColor = colors.mazeColor;
@@ -331,6 +336,7 @@ function rosas_mdmt(page,itemsPerPage){ //there are 32 items in rosas_mdmtItems,
         }
 
         else{ //remaining rows have first the item, then 7 columns with a button in each for rating
+            console.log("row others");
             var i_item = first_item+rowIndex-1;
             var item = rosas_mdmtOrder[i_item];
 
@@ -351,6 +357,7 @@ function rosas_mdmt(page,itemsPerPage){ //there are 32 items in rosas_mdmtItems,
         } 
         tbody.appendChild(row);
     }
+}catch(err){console.log(err.message);}
 
     table.appendChild(tbody);
     
@@ -542,8 +549,7 @@ function confirm_demo_exp(){
 
 //FEEDBACK IF PARTICIPANTS SO WANT, mark the end of the questionnaire for good ================================================================================
 function openFeedback(){
-    question_ = "Do you want to add anything else? You can write it down here.";
-    document.getElementById("main_container").innerHTML =`<div class='row2'></br></br><textarea id="feedback">${question_}</textarea></div><div class='row3'><button id='confirm_openFeedback' onclick='confirm_openFeedback()'>Next</button></div>`;
+    document.getElementById("main_container").innerHTML =`<div class='row2'></br></br><textarea id="feedback" placeholder="Do you want to add anything else? You can write it down here."></textarea></div><div class='row3'><button id='confirm_openFeedback' onclick='confirm_openFeedback()'>Next</button></div>`;
     var feedback = document.getElementById("feedback");
     feedback.style.width = "70%";
     feedback.style.height = "200px";

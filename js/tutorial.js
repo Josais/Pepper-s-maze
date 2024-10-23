@@ -21,9 +21,8 @@ function tutorial1(){
 function tutorial2(){
     // console.log("in tuto2: " +tutorialMode);
     var container = document.getElementById("main_container");
-    container.innerHTML= "<div class='bigBlock'><div>There are three additional pieces of data on the screen: <span style='color:#00BF63'>the number of coins you collected this round</span>, <span style='color:#38B6FF'>which round you are playing in the game</span>, and <span style='color:#FF3131'>the timer</span>.</div><img src='../img/top_page.png'></img></br></br><button class='nextButton' onclick='tutorial2b()'>Let's go!</button></div>";
+    container.innerHTML= "<div class='bigBlock'><div>There are three additional pieces of data on the screen: <span style='color:#00BF63'>the number of coins you collected this round</span>, <span style='color:'>which round you are playing in the game</span>, and <span style='color:#FF3131'>the timer</span>.</div><img src='../img/top_page.png'></img></br></br><button class='nextButton' onclick='tutorial2b()'>Let's go!</button></div>";
 }
-
 function tutorial2b(){
     var container = document.getElementById("main_container");
     container.innerHTML= "<div class='bigBlock'><div>You will now play a very short round of the searching game. The round will stop as soon as you have collected your first coin.</div></br></br><button class='nextButton' onclick='tutorial3()'>Let's go!</button></div>";
@@ -82,7 +81,7 @@ function tutorial5(){
 
 function tutorial6(){
     var container = document.getElementById("main_container");
-    container.innerHTML= "<div class='bigBlock'><div>There are two different types of scores in this game: the team score, and the individual score. Thoses scores are contradictory, meaning you cannot gain both team score and individual score at the same time.</div><div>At the end of each round, you and the robot will make a trust decision. You will choose between collaborating with the robot and integrating your round score to the team score, or not collaborating and keeping your round score to your individual score.</div></br></br><button class='nextButton' onclick='tutorial7()'>Next</button></div>";
+    container.innerHTML= "<div class='bigBlock'><div>There are two different types of scores in this game: the <span style='color:#03a108;'>team score</span>, and the <span style='color:#5d00ff;'>individual score</span>. Thoses scores are contradictory, meaning you cannot gain both team score and individual score at the same time.</div><div>At the end of each round, you and the robot will make a trust decision. You will choose between collaborating with the robot and integrating your round score to the <span style='color:#03a108;'>team score</span>, or not collaborating and keeping your round score to your <span style='color:#5d00ff;'>individual score</span>.</div></br></br><button class='nextButton' onclick='tutorial7()'>Next</button></div>";
 }
 
 function tutorial7(){
@@ -122,7 +121,7 @@ function tutorial13(){
 
 function tutorial14(){
     var container = document.getElementById("main_container");
-    container.innerHTML= "<div class='bigBlock'><div>Based on this scoring mechanisms, you can earn an added bonus of 1 euro for each game where the team score surpasses 60 points. Alternatively, you can earn an added bonus of 25 cents for each game where your individual score surpasses 10 points. So consider your strategy carefully and decide whether you would like to work toward maximizing your individual score or the team score and potentially gaining an added bonus.</div></br></br><button class='nextButton' onclick='tutorial15()'>Next</button></div>";
+    container.innerHTML= "<div class='bigBlock'><div>Based on this scoring mechanisms, you can earn an added bonus of 1 euro for each game where the <span style='color:#03a108;'>team score</span> surpasses 60 points. Alternatively, you can earn an added bonus of 25 cents for each game where your <span style='color:#5d00ff;'>individual score</span> surpasses 10 points. So consider your strategy carefully and decide whether you would like to work toward maximizing your individual score or the team score and potentially gaining an added bonus.</div></br></br><button class='nextButton' onclick='tutorial15()'>Next</button></div>";
 }
 
 function tutorial15(){ // QUESTION 2.1

@@ -117,8 +117,14 @@ img{
     height:100%;
 }
 
+.scale7_explained{
+    font-size: 20px;
+    font-style: italic;
+    color: #a1a1a1;
+}
+
 .consent_button{
-    width:50%;
+    width:40%;
     height:70px;
 }
 
@@ -197,6 +203,7 @@ div.col {
     background-color: white;
     position: relative;
     color: #000000;
+    /* margin-top: 20%; */
     /* align-content:center;
     justify-content: center; */
 }
@@ -209,7 +216,9 @@ div.col {
 }
 
 .insideEnvelope{
+    padding-top: 20%;
     align-self: center;
+    font-size: 25px;
     
 }
 
