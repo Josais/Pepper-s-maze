@@ -123,7 +123,7 @@ var rep_questionnaire = {
 
 var question_;
 
-// EVENT LISTENER =======================================================================================================
+// EVENT LISTENER ==================================================================================================
 // window.addEventListener("load",  dispoTrust);
 
 
@@ -374,7 +374,6 @@ function confirm_rosas_mdmt(page,itemsPerPage){
             rosas_mdmt(page+1,itemsPerPage);
         }
         else{
-            //nextfunction
             demographics_age();
         }
         
@@ -395,7 +394,6 @@ function confirm_demographics_age(){
         alert("One item or more is missing a rating.");
     }
     else{
-        //nextfunction
         demographics_gender();
     }
 
@@ -545,17 +543,6 @@ function confirm_demo_exp(){
 //FEEDBACK IF PARTICIPANTS SO WANT, mark the end of the questionnaire for good ================================================================================
 function openFeedback(){
     question_ = "Do you want to add anything else? You can write it down here.";
-
-    // document.getElementById("main_container").innerHTML =`<div class='row2'><label for="feedback">${question_}</label></br><input type="text" id="feedback" name="feedback" size="10" /></div><div class='row3'><button id='confirm_openFeedback' onclick='confirm_openFeedback()'>Next</button></div>`;
-    // var feedback = document.getElementById("feedback");
-    // feedback.style.width = "70%";
-    // feedback.style.height = "300px";
-    // feedback.style.boxSizing = "border-box";
-    // feedback.style.border = "2px solid #ccc";
-    // feedback.style.borderRadius = "4px";
-    // feedback.style.resize = "none";
-    // feedback.style.padding = "12px 20px";
-
     document.getElementById("main_container").innerHTML =`<div class='row2'></br></br><textarea id="feedback">${question_}</textarea></div><div class='row3'><button id='confirm_openFeedback' onclick='confirm_openFeedback()'>Next</button></div>`;
     var feedback = document.getElementById("feedback");
     feedback.style.width = "70%";
@@ -565,7 +552,6 @@ function openFeedback(){
     feedback.style.padding = "12px 20px";
    
 }
-// window.addEventListener("load", howManyRounds);
 
 function confirm_openFeedback(){
     rep_questionnaire["openEndedQuestion"]= document.getElementById("feedback").value;
@@ -575,7 +561,7 @@ function confirm_openFeedback(){
 //THE END OF EVERYTHING ==================================================================================================================================
 function theEnd_ofthequestionnaire(){
     document.getElementById("main_container").innerHTML = "";
-//TODO
+    //TODO: text
 
     //download data in a file
     const a = document.createElement('a');
@@ -590,11 +576,9 @@ function rep(code_item,rating){
     var itt;
     if(scale7.includes(code_item)){
         itt = 7;
-    }
-    if(scale5.includes(code_item)){
+    }else if(scale5.includes(code_item)){
         itt=5;
-    }
-    if(scale4.includes(code_item)){
+    }else if(scale4.includes(code_item)){
         itt = 4;
     }
 

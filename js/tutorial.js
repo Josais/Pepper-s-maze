@@ -15,13 +15,13 @@ function tutorial1(){
     }else{
         additional_info = " You can also move using the arrows on the keyboard."
     }
-    container.innerHTML= `<div class='bigBlock'><div>This is the <span style='color: #FF3131'>playground</span>. Yellow disks represents coins. You are the blue cell. You can move around the maze by pressing <span style='color: #00BF63'>those buttons</span> on the screen.${additional_info}</div><img src='../img/maze.png' width='600px'></img> </br></br><button class='nextButton' onclick='tutorial2()'>Next</button></div>`;
+    container.innerHTML= `<div class='bigBlock'><div>This is the <span style='color: #FF3131'>playground</span>. Yellow disks represents coins. You are the blue cell. You can move around the maze by pressing <span style='color: #00BF63'>those buttons</span> on the screen.${additional_info}</div><img src='../img/maze.png'></img> </br></br><button class='nextButton' onclick='tutorial2()'>Next</button></div>`;
 }
 
 function tutorial2(){
     // console.log("in tuto2: " +tutorialMode);
     var container = document.getElementById("main_container");
-    container.innerHTML= "<div class='bigBlock'><div>There are three additional pieces of data on the screen: <span style='color:#00BF63'>the number of coins you collected this round</span>, <span style='color:#38B6FF'>which round you are playing in the game</span>, and <span style='color:#FF3131'>the timer</span>.</div><img src='../img/top_page.png' width='600px'></img></br></br><button class='nextButton' onclick='tutorial2b()'>Let's go!</button></div>";
+    container.innerHTML= "<div class='bigBlock'><div>There are three additional pieces of data on the screen: <span style='color:#00BF63'>the number of coins you collected this round</span>, <span style='color:#38B6FF'>which round you are playing in the game</span>, and <span style='color:#FF3131'>the timer</span>.</div><img src='../img/top_page.png'></img></br></br><button class='nextButton' onclick='tutorial2b()'>Let's go!</button></div>";
 }
 
 function tutorial2b(){

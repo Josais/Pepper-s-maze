@@ -1,6 +1,6 @@
 const isOnPepper = false;
 
-const roundPerGame = 1; //needs to be below or equal to 6; can be less but the no fail/fail rounds will stay in the same order: no fail, no fail, fail, fail, fail, no fail
+const roundPerGame = 6; //needs to be below or equal to 6; can be less but the no fail/fail rounds will stay in the same order: no fail, no fail, fail, fail, fail, no fail
 const gamePerExperiment = 1; //works for 1 or 2 only
 
 const randomSpawn = false; //if true, the point from which participant start each round will be randomized; if false, it will be fixed to the middle of the maze
@@ -167,10 +167,6 @@ const dbIDWords = ["apple", "avocado", "basil", "berry", "biscuit", "brownie", "
 
 var participantID = randomID(4,"false");
 
-var timer;
-const ms = 0, sec = 2, min = 0; //fixes timer length for each round
-var millis, secs, minu;
-
 var teamScore =0, roundTeamScore=0, pepperIndivScore=0;
 var currentRound = 1;
 var currentGame = 1;
@@ -179,29 +175,18 @@ var hist;
 if(isOnPepper){
     hist = ""; //for each game: game_number, failType, humanIndiv, teamScore, totalCoinsGameHuman, pastChoices, EORquestionsRep, EOGquestionRep
 }else{
-    hist = {
-        "participantID": participantID,
-        'game_nb': "",
-        "stratType": "",
-        "failType": "",
-        "humanIndiv": "",
-        "teamScore": "",
-        "totalCoinsGameHuman" : "",
-        "pastChoices": "",
-        "EORquestionsRep": "",
-        "EOGquestionRep": "",
-    };
+    hist = {};
 }
-
-
 
 var EORquestionsType = ["honesty", "perf"];
 var EORquestionsRep = [], EOGquestionsRep =[]; // for eor : [round, "perf" or "honesty", rating] for each round, twice, for eog : [game, rating]
 
 //TIMER =========================================================================================================
+var timer;
+const ms = 0, sec = 15, min = 0; //fixes timer length for each round
+var millis, secs, minu;
+
 function timerManager() {
-    // alert("in timerManager");
-    // try{
     if(millis!=0){
          millis--;
     }
@@ -226,13 +211,9 @@ function timerManager() {
 
     var txt= `${minute}:${seconds}:${milli}`;
     timer.innerHTML =txt;
-    // }catch(err){
-    //     document.getElementById("main_container").innerHTML = err.message;
-    // }
 };
 
 function startTimer(){
-    // alert("in startTimer");
     timer =  document.getElementById("timer_container");
 
     millis = ms;
@@ -246,11 +227,7 @@ function startTimer(){
     timer.innerHTML = `${minu}:${secs}:${millis}`;
     console.log(timer);
 
-    // try{
     time = setInterval(timerManager,10);
-    // }catch(err){
-    //     document.getElementById("main_container").innerHTML = err.message;
-    // }
 }
 
 function stopTimer(){
@@ -319,22 +296,16 @@ function refreshMap(who){
     humanCell = document.getElementById("cell_" + who.y + "_" + who.x); //get the new cell
 
     if(humanCell.getAttribute("isCoin") == "true"){ //if coin, collect
-        // alert("refreshmap: in iscoin true");
         pickCoin(who);
         humanCell.innerHTML = "";
     }
-    // alert("refreshmap: before changing color cell");
     humanCell.style.backgroundColor = who.color; //actual move, color the cell as the character
 }
 
 function pickCoin(who){
-    // alert("pickCoin: start");
     if(tutorialMode){ //in the tutorial, collecting one coin is the end of the round; calls to the next step of the tutorial
-        // alert("pickCoin: if tuto");
-        // endOfRound(); //à enlever après les tests
-        tutorial4(); //le remettre, c'est pour les tests vu que le timer fonctionne toujours pas
+        tutorial4(); 
     }else{
-        // alert("pickCoin: in else");
         who.tempCoinsFound++;
         humanCell.setAttribute("isCoin", "false");
         document.getElementById("tempScore_container").innerHTML = "Coins collected this round = " + who.tempCoinsFound.toString();
@@ -368,32 +339,21 @@ function startExperiment(){
 }
 
 function startExperiment2(){
-    // alert("in startExperiment2 from maze.js");
-    // try{
         tutorialMode = false; //true for the tests, false after the tests !!!
 
         var container = document.getElementById("main_container");
-    // }catch(err){
-    //     document.getElementById("main_container").innerHTML = err.message;
-    // }
-    // try{
         if(gamePerExperiment==2){ //and roundPerGame == 5
             container.innerHTML="<div style='margin: 0 50px;'>As seen in the tutorial, you are going to play two five-round games with Pepper, each game being independant to the other. They consist in exploring a maze and collecting coins. Although you will not be able to see what Pepper is doing, and Pepper will not have access to what you are doing, you will be working towards a same goal: maximizing your team score. <br> </div><div><button id='launchGame' onclick='startGame()'>Launch Game</button></div>";
         }
         if(gamePerExperiment==1){
             container.innerHTML="<div style='margin: 0 50px;'>You are going to play a six-round game with Pepper. It consists in exploring a maze and collecting coins. Although you will not be able to see what Pepper is doing, and Pepper will not have access to what you are doing, you will be working towards a same goal: maximizing your team score. <br> </div><div><button id='launchGame' onclick='startGame()'>Launch Game</button></div>";
         }
-    // }catch(err){
-    //     document.getElementById("main_container").innerHTML = err.message;
-    // }
     
 }
 
 function startGame(){
-    // alert("in startGame from maze.js");
     
     if(currentRound==1){
-        // alert("in startGame from maze.js, if currentRound");
         if(multipleFailTypes){
             failType = failures[currentGame-1];
         }
@@ -401,14 +361,11 @@ function startGame(){
         console.log("stratType= " +stratType + "; failtype= " + failType + "; failures= " + failures);
         pepperMsgInit();
     }else{
-        // alert("in startGame from maze.js, else");
         init();
     }
-    // alert("in startGame from maze.js, after if/else");
 }
 
 function init() {
-    // alert("in init of maze.js");
     var container = document.getElementById("main_container");
     container.style.flexFlow = 'column wrap';
     container.innerHTML=`<div class='row1' style = 'flex-direction: row;'><div id='tempScore_container'>Coins collected this round = 0</div><div id='round_container'>Round ${currentRound}/${roundPerGame}</div><div id='timer_container' class='timer'>${min}:${sec}:${ms}</div></div><div class='row2' style = 'flex-direction: row;'><button class='moveButton' onclick='moveUp(human)'><span>&#8593;</span></button></div> <div class='row3' style = 'flex-direction: row;'><button class='moveButton' onclick='moveLeft(human)'><span>&#8592;</span></button><div id='maze_container' class = 'maze_container'></div><button onclick='moveRight(human)' class='moveButton'><span>&#8594;</span></button></div><div class='row4' style = 'flex-direction: row;'><button onclick='moveDown(human)' class='moveButton'><span>&#8595;</span></button></div>`;
@@ -421,14 +378,11 @@ function init() {
 }
 
 function launchRound(){
-    // alert("in launchRound of maze.js");
     if(randomMazeGen){
-        // alert("in launchRound of maze.js, if randomMazeGen");
         baseMaze();
         addCells();
         addCoins();
     }else{
-        // alert("in launchRound of maze.js, if !randomMazeGen");
         var center = document.getElementById("maze_container");
 
         var mazeBoxInfo = center.getBoundingClientRect();
@@ -909,30 +863,29 @@ function repEOG7(){
 }
 
 function endGame(){
-    // alert("in endGame");
     if(isOnPepper){ 
         hist = `${currentGame}, ${failType}, ${human.indivScore},${teamScore}, ${human.totalCoinsFound}, ${human.pastChoices},${EORquestionsRep},${EOGquestionsRep[currentGame-1]}`;
         downloadData();
     }else{
+        hist["participantID"]= participantID;
         hist["game_nb"] = currentGame;
         hist["stratType"] = stratType;
         hist["failType"] = failType;
         hist["humanIndiv"] = human.indivScore;
         hist["teamScore"] = teamScore;
-        hist["totalcoinsGameHuman"] = human.totalCoinsFound;
+        hist["totalCoinsGameHuman"] = human.totalCoinsFound;
         hist["pastChoices"] = human.pastChoices;
         hist["EORquestionsRep"] = EORquestionsRep;
         hist["EOGquestionRep"] = EOGquestionsRep[currentGame-1];
     }
     
     if(gamePerExperiment==2 && currentGame==1){
-        //TODO: modify layout, style; scores are too little (bc p probably)
         var container = document.getElementById("main_container");
         container.innerHTML=`<div id='endGameTxt' class='row2'>You finished the first game. The scores are as followed: <div style='border: 1px solid white; padding: 0px 50px;' ><p>Your individual score: ${human.indivScore}</p><p>Pepper's individual score: ${pepperIndivScore}</p><p>Team score: ${teamScore} </p></div> </div> <div class = 'row3'>Before going to the second and last game, please move to the computer and fill in the corresponding questionnaire. Start by entering the four-word anonymiwed ID in the survey.</br></br><div id='participantID' style='padding: 5px 100px;'></div></br></br> Once done, you can start the next game by clicking on the button below. </div><div class='row4'><button id='nextRoundButton' onclick='nextGame()' class='choiceButton'>Next game</button></div>`;
 
-        // var participant = document.getElementById("participantID");
-        // participant.innerHTML = participantID;
-        // participant.style.border = "1px #FFFFFF solid";
+        var participant = document.getElementById("participantID");
+        participant.innerHTML = participantID;
+        participant.style.border = "1px #FFFFFF solid";
     }else{
         theEnd();
     }
@@ -975,7 +928,7 @@ function theEnd(){
 }
 
 function downloadData(){ 
-    //called twice per participant, once per game (so two lines per participants)
+    //called twice per participant, once per game (so two lines per participants), only if isOnPepper == true
 
     var xhr = new XMLHttpRequest();
     xhr.open("GET", `https://ics-pepper.science.uu.nl/html/post.php?id=${participantID}&strat=${stratType}&hist=${hist}`);
@@ -1226,8 +1179,12 @@ function randomID(x, repeatWord){
 
     for(var i=0; i<x; i++){
         index = randomIndex(dbIDWords.length);
-        randId += dbIDWords[index] + " ";
-
+        if(isOnPepper){
+            randId += dbIDWords[index] + " ";
+        }else{
+            randId += dbIDWords[index] + "_";
+        }
+        
         if(repeatWord == "false"){
             dbIDWords.splice(index,1);
         }
