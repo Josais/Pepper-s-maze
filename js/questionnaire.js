@@ -132,7 +132,7 @@ function dispoTrust(){
     var dtOrder = shuffleArray(["dt1","dt2","dt3","dt4","dt5","dt6"]);
     question_ = "How much do you find those statements to be true?";
 
-    document.getElementById("main_container").innerHTML = `<div class='row2' style="font-size:40px;">${question_}</div><div class='row3' id='table_dt'></div><div class='row4'><button id='confirmDT' onclick='confirmDT()'>Next</button></div>`;
+    document.getElementById("main_container").innerHTML = `<div class='row2' style="font-size:35px;">${question_}</div><div class='row3' id='table_dt'></div><div class='row4'><button id='confirmDT' onclick='confirmDT()'>Next</button></div>`;
     
     var rowIndex, colIndex;
     
@@ -197,9 +197,7 @@ function confirmDT(){
         }
     }
     if(cont){
-        //nextfunction
         tutorial0();
-        // alert("everything was good, I just need to add the next function");
     }
 }
 
@@ -209,7 +207,7 @@ function howManyRounds(){
     question_ = "How many rounds were played in the game?";
     var choices_rounds = ["Deux (2)","Quatre (4)", "Six (6)", "Huit (8)"];
 
-    document.getElementById("main_container").innerHTML = `<div class='row2'>${question_}</div><div class='row3' id='table_dt'></div><div class='row4'><button id='confirm_howManyRounds' onclick='confirm_howManyRounds()'>Next</button></div>`;
+    document.getElementById("main_container").innerHTML = `<div class='row2' style="font-size:35px;">${question_}</div><div class='row3' id='table_dt'></div><div class='row4'><button id='confirm_howManyRounds' onclick='confirm_howManyRounds()'>Next</button></div>`;
     
     var rowIndex, colIndex;
     
@@ -227,6 +225,7 @@ function howManyRounds(){
             if(colIndex==0){
                 col.innerHTML= choices_rounds[rowIndex];
                 col.style.width = "50%";
+                col.style.fontSize = "25px";
             }
             else{
                 col.innerHTML=`<button class="q_button" id="button_rounds_${rowIndex+1}" rounds="${choices_rounds[rowIndex]}" onclick="rep('rounds',${rowIndex+1})"></button>`;
@@ -246,9 +245,7 @@ function confirm_howManyRounds(){
         alert("One item or more is missing a rating.");
     }
     else{
-        //nextfunction
         pepperAlloc();
-        // alert("everything was good, I just need to add the next function");
     }
 }
 
@@ -257,7 +254,7 @@ function pepperAlloc(){
     question_ = "What were Pepper's allocation decisions in the last two rounds of the game?";
     var choices_pepperAlloc = shuffleArray(["team/team","team/individual", "individual/team", "individual/individual"]);
 
-    document.getElementById("main_container").innerHTML = `<div class='row2'>${question_}</div><div class='row3' id='table_dt'></div><div class='row4'><button id='confirm_pepperAlloc' onclick='confirm_pepperAlloc()'>Next</button></div>`;
+    document.getElementById("main_container").innerHTML = `<div class='row2' style="font-size:35px;">${question_}</div><div class='row3' id='table_dt'></div><div class='row4'><button id='confirm_pepperAlloc' onclick='confirm_pepperAlloc()'>Next</button></div>`;
     
     var rowIndex, colIndex;
     
@@ -275,6 +272,7 @@ function pepperAlloc(){
             if(colIndex==0){
                 col.innerHTML= choices_pepperAlloc[rowIndex];
                 col.style.width = "50%";
+                col.style.fontSize = "25px";
             }
             else{
                 col.innerHTML=`<button class="q_button" id="button_pepAlloc_${rowIndex+1}" pepAlloc="${choices_pepperAlloc[rowIndex]}" onclick="rep('pepAlloc',${rowIndex+1})"></button>`;
@@ -294,9 +292,7 @@ function confirm_pepperAlloc(){
         alert("One item or more is missing a rating.");
     }
     else{
-        //nextfunction
         rosas_mdmt(1,16);
-        // alert("everything was good, I just need to add the next function");
     }
 }
 
@@ -380,7 +376,6 @@ function confirm_rosas_mdmt(page,itemsPerPage){
         else{
             //nextfunction
             demographics_age();
-            // alert("everything was good, I just need to add the next function");
         }
         
     }
@@ -390,7 +385,7 @@ function confirm_rosas_mdmt(page,itemsPerPage){
 function demographics_age(){
     question_ = "How old are you?";
 
-    document.getElementById("main_container").innerHTML =`<div class='row2'><label for="age" style="font-size:40px;">${question_}</label></br><input type="text" id="age" name="age" size="10" style="font-size:40px; width:30% ; height:60px; padding: 20px 10px; text-align:center;"/></div><div class='row3'><button id='confirm_demographics_age' onclick='confirm_demographics_age()'>Next</button></div>`;
+    document.getElementById("main_container").innerHTML =`<div class='row2'><label for="age" style="font-size:35px;">${question_}</label></br><input type="text" id="age" name="age" size="10" style="font-size:35px; width:30% ; height:60px; padding: 20px 10px; text-align:center;"/></div><div class='row3'><button id='confirm_demographics_age' onclick='confirm_demographics_age()'>Next</button></div>`;
 }
 
 function confirm_demographics_age(){
@@ -402,7 +397,6 @@ function confirm_demographics_age(){
     else{
         //nextfunction
         demographics_gender();
-        // alert("everything was good, I just need to add the next function");
     }
 
     
@@ -412,7 +406,7 @@ function demographics_gender(){
     question_ = "How do you identify?";
     var choices_demo_gender = shuffleArray(["Woman","Man","Nonbinary"]).concat(["Prefers not to say"]);
 
-    document.getElementById("main_container").innerHTML = `<div class='row2' style="font-size:40px;">${question_}</div><div class='row3' id='table_dt'></div><div class='row4'><button id='confirm_demo_gender' onclick='confirm_demo_gender()'>Next</button></div>`;
+    document.getElementById("main_container").innerHTML = `<div class='row2' style="font-size:35px;">${question_}</div><div class='row3' id='table_dt'></div><div class='row4'><button id='confirm_demo_gender' onclick='confirm_demo_gender()'>Next</button></div>`;
     
     var rowIndex, colIndex;
     
@@ -450,9 +444,7 @@ function confirm_demo_gender(){
         alert("One item or more is missing a rating.");
     }
     else{
-        //nextfunction
         demographics_study();
-        // alert("everything was good, I just need to add the next function");
     }
 }
 
@@ -460,7 +452,7 @@ function demographics_study(){
     question_= "How much of your education and/or occupation is related to technology?";
     var ratings_demo_study = ["Not at all related", "A little bit related", "Moderately related", "Related", "Completely related"];
 
-    document.getElementById("main_container").innerHTML = `<div class='row2' style="font-size:40px;">${question_}</div><div class='row3' id='table_dt'></div><div class='row4'><button id='confirm_demo_study' onclick='confirm_demo_study()'>Next</button></div>`;
+    document.getElementById("main_container").innerHTML = `<div class='row2' style="font-size:35px;">${question_}</div><div class='row3' id='table_dt'></div><div class='row4'><button id='confirm_demo_study' onclick='confirm_demo_study()'>Next</button></div>`;
     
     var rowIndex, colIndex;
     
@@ -498,9 +490,7 @@ function confirm_demo_study(){
         alert("One item or more is missing a rating.");
     }
     else{
-        //nextfunction
         demographics_exp();
-        // alert("everything was good, I just need to add the next function");
     }
 }
 
@@ -508,7 +498,7 @@ function demographics_exp(){
     question_= "How much previous experience with robots do you have?";
     var ratings_demo_exp = ["Nothing at all", "I've seen some, but no interaction", "I've interacted with one under supervision (at an event, for example)", "I've worked with robots once", "I frequently interact or work with robots"];
 
-    document.getElementById("main_container").innerHTML = `<div class='row2' style="font-size:40px;">${question_}</div><div class='row3' id='table_dt'></div><div class='row4'><button id='confirm_demo_exp' onclick='confirm_demo_exp()'>Next</button></div>`;
+    document.getElementById("main_container").innerHTML = `<div class='row2' style="font-size:35px;">${question_}</div><div class='row3' id='table_dt'></div><div class='row4'><button id='confirm_demo_exp' onclick='confirm_demo_exp()'>Next</button></div>`;
     
     var rowIndex, colIndex;
     
@@ -548,9 +538,7 @@ function confirm_demo_exp(){
         alert("One item or more is missing a rating.");
     }
     else{
-        //nextfunction
         openFeedback();
-        // alert("everything was good, I just need to add the next function");
     }
 }
 
@@ -577,7 +565,7 @@ function openFeedback(){
     feedback.style.padding = "12px 20px";
    
 }
-// window.addEventListener("load", demographics_exp);
+// window.addEventListener("load", howManyRounds);
 
 function confirm_openFeedback(){
     rep_questionnaire["openEndedQuestion"]= document.getElementById("feedback").value;
@@ -586,9 +574,15 @@ function confirm_openFeedback(){
 
 //THE END OF EVERYTHING ==================================================================================================================================
 function theEnd_ofthequestionnaire(){
-    //TODO
-
     document.getElementById("main_container").innerHTML = "";
+//TODO
+
+    //download data in a file
+    const a = document.createElement('a');
+    const blob = new Blob([JSON.stringify(hist) + JSON.stringify(rep_questionnaire)]);
+    a.href = URL.createObjectURL(blob);
+    a.download = participantID;
+    a.click();
 }
 
 //RESPONSE MANAGEMENT FUNCTION ================================================================================================================================================================

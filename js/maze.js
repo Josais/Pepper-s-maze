@@ -162,10 +162,10 @@ var mapsIndex = 0;
 // console.log(mapsOrder);
 
 //the participant ID is needed in case the questionnaire and the game are not done on the same machine
-// const dbIDWords = ["apple", "avocado", "basil", "berry", "biscuit", "brownie", "caramel", "cheese", "crepe", "coffee", "chicken", "dinner", "drink", "egg", "food", "freezer", "fish", "granola", "grape", "honey", "jelly", "kiwi", "kettle", "lunch", "lettuce", "melon", "milk", "nectar", "olive", "oven", "oyster", "pasta", "plate", "potato", "popcorn", "pumpkin", "radish", "rice", "recipe", "raisin", "salmon", "spicy", "soda", "sugar", "tea", "vanilla", "vinegar", "waffle", "yam", "water"];
+const dbIDWords = ["apple", "avocado", "basil", "berry", "biscuit", "brownie", "caramel", "cheese", "crepe", "coffee", "chicken", "dinner", "drink", "egg", "food", "freezer", "fish", "granola", "grape", "honey", "jelly", "kiwi", "kettle", "lunch", "lettuce", "melon", "milk", "nectar", "olive", "oven", "oyster", "pasta", "plate", "potato", "popcorn", "pumpkin", "radish", "rice", "recipe", "raisin", "salmon", "spicy", "soda", "sugar", "tea", "vanilla", "vinegar", "waffle", "yam", "water"];
 //another DB of 50 words: ["sample", "theory", "income", "judgment", "cookie", "highway", "bathroom", "estate", "drama", "wedding", "person", "patience", "basket", "girlfriend", "concept", "driver", "housing", "contract", "outcome", "problem", "context", "coffee", "product", "garbage", "fishing", "payment", "buyer", "shopping", "airport", "boyfriend", "power", "friendship", "safety", "county", "data", "storage", "language", "basis", "dinner", "topic", "success", "teaching", "system", "orange", "movie", "woman", "presence", "science", "climate", "sector"];
 
-// var participantID = randomID(4,"false");
+var participantID = randomID(4,"false");
 
 var timer;
 const ms = 0, sec = 2, min = 0; //fixes timer length for each round
@@ -175,7 +175,25 @@ var teamScore =0, roundTeamScore=0, pepperIndivScore=0;
 var currentRound = 1;
 var currentGame = 1;
 
-var hist = "";//for each game: game_number, failType, humanIndiv, teamScore, totalCoinsGameHuman, pastChoices, EORquestionsRep, EOGquestionRep
+var hist;
+if(isOnPepper){
+    hist = ""; //for each game: game_number, failType, humanIndiv, teamScore, totalCoinsGameHuman, pastChoices, EORquestionsRep, EOGquestionRep
+}else{
+    hist = {
+        "participantID": participantID,
+        'game_nb': "",
+        "stratType": "",
+        "failType": "",
+        "humanIndiv": "",
+        "teamScore": "",
+        "totalCoinsGameHuman" : "",
+        "pastChoices": "",
+        "EORquestionsRep": "",
+        "EOGquestionRep": "",
+    };
+}
+
+
 
 var EORquestionsType = ["honesty", "perf"];
 var EORquestionsRep = [], EOGquestionsRep =[]; // for eor : [round, "perf" or "honesty", rating] for each round, twice, for eog : [game, rating]
@@ -892,11 +910,21 @@ function repEOG7(){
 
 function endGame(){
     // alert("in endGame");
-    hist = `${currentGame}, ${failType}, ${human.indivScore},${teamScore}, ${human.totalCoinsFound}, ${human.pastChoices},${EORquestionsRep},${EOGquestionsRep[currentGame-1]}`;
-
-    //downloading all data on the computer, once every game
-    // downloadData();
-
+    if(isOnPepper){ 
+        hist = `${currentGame}, ${failType}, ${human.indivScore},${teamScore}, ${human.totalCoinsFound}, ${human.pastChoices},${EORquestionsRep},${EOGquestionsRep[currentGame-1]}`;
+        downloadData();
+    }else{
+        hist["game_nb"] = currentGame;
+        hist["stratType"] = stratType;
+        hist["failType"] = failType;
+        hist["humanIndiv"] = human.indivScore;
+        hist["teamScore"] = teamScore;
+        hist["totalcoinsGameHuman"] = human.totalCoinsFound;
+        hist["pastChoices"] = human.pastChoices;
+        hist["EORquestionsRep"] = EORquestionsRep;
+        hist["EOGquestionRep"] = EOGquestionsRep[currentGame-1];
+    }
+    
     if(gamePerExperiment==2 && currentGame==1){
         //TODO: modify layout, style; scores are too little (bc p probably)
         var container = document.getElementById("main_container");
@@ -946,14 +974,14 @@ function theEnd(){
     container.innerHTML=`<div class ='row2'>${message1} The scores are as followed: </br></br><div style='border: 1px solid white; padding: 0px 50px;' ><p>Your individual score: ${human.indivScore}</p><p>Pepper's individual score: ${pepperIndivScore}</p><p>Team score: ${teamScore} </p></div> </br></br>${message2}`;
 }
 
-// function downloadData(){ 
-//     //called twice per participant, once per game (so two lines per participants)
+function downloadData(){ 
+    //called twice per participant, once per game (so two lines per participants)
 
-//     var xhr = new XMLHttpRequest();
-//     xhr.open("GET", `https://ics-pepper.science.uu.nl/html/post.php?id=${participantID}&strat=${stratType}&hist=${hist}`);
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", `https://ics-pepper.science.uu.nl/html/post.php?id=${participantID}&strat=${stratType}&hist=${hist}`);
 
-//     xhr.send();
-// }
+    xhr.send();
+}
 
 //MAZE CREATIONS FUNCTIONS (only used if randomMazeGen == true) ===============================================================
 function baseMaze() {
