@@ -126,7 +126,7 @@ var rep_questionnaire = {
 var question_;
 
 // EVENT LISTENER ==================================================================================================
-window.addEventListener("load",  rosas_mdmt);
+// window.addEventListener("load",  rosas_mdmt(1,16));
 
 
 //DISPOSITIONAL TRUST: before the game =================================================================================
