@@ -126,7 +126,7 @@ var rep_questionnaire = {
 var question_;
 
 // EVENT LISTENER ==================================================================================================
-// window.addEventListener("load",  dispoTrust());
+// window.addEventListener("load",  theEnd_ofthequestionnaire());
 
 
 //DISPOSITIONAL TRUST: before the game =================================================================================
@@ -660,8 +660,12 @@ function confirm_openFeedback(){
 
 //THE END OF EVERYTHING ==================================================================================================================================
 function theEnd_ofthequestionnaire(){
+    var end_text = document.createElement("div");
+    end_text.innerHTML = "You have finished the experiment. Thank you for participating! </br></br> Please call out for the experimenter to signal you are done. If you would like it, she can debrief you already, explaining what the true purpose of the experiment was and so on. Again, thank you for participating!";
+    end_text.style.padding = "0% 30%";
+
     document.getElementById("main_container").innerHTML = "";
-    //TODO: text
+    document.getElementById("main_container").appendChild(end_text);
 
     //download data in a file
     const a = document.createElement('a');
