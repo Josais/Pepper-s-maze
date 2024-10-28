@@ -126,7 +126,7 @@ var rep_questionnaire = {
 var question_;
 
 // EVENT LISTENER ==================================================================================================
-// window.addEventListener("load",  rosas_mdmt(1,16));
+// window.addEventListener("load",  dispoTrust());
 
 
 //DISPOSITIONAL TRUST: before the game =================================================================================
@@ -134,7 +134,7 @@ function dispoTrust(){
     var dtOrder = shuffleArray(["dt1","dt2","dt3","dt4","dt5","dt6"]);
     question_ = "How much do you find those statements to be true?";
 
-    document.getElementById("main_container").innerHTML = `<div class='row2' style="font-size:35px;">${question_}${scale7_explained}</div><div class='row3' id='table_dt'></div><div class='row4'><button id='confirmDT' onclick='confirmDT()'>Next</button></div>`;
+    document.getElementById("main_container").innerHTML = `<div class='row2' style="font-size:35px;">${question_}${scale7_explained}</div><div class='row3' id='table_dt'></div><div class='row4' id='row_confirm'><button id='confirmDT' onclick='confirmDT()'>Next</button></div>`;
     
     var rowIndex, colIndex;
     
@@ -193,7 +193,19 @@ function confirmDT(){
     var cont = true;
     for (i = 1; i<=6 ; i++){
         if(rep_questionnaire[`dt${i}`]==""){
-            alert("One item or more is missing a rating.");
+            var text_missing = document.createElement("div");
+            text_missing.innerHTML = "One item or more is missing a rating. You can fill them in, or ignore it by clicking on the button below once more. </br>";
+            text_missing.className = "rating_missing_questionnaire";
+
+            var button_confirm = document.createElement("button");
+            button_confirm.innerHTML = "Confirm";
+            button_confirm.setAttribute("onclick","tutorial0()"); 
+
+            document.getElementById("row_confirm").innerHTML="";
+            document.getElementById("row_confirm").appendChild(text_missing);
+            document.getElementById("row_confirm").appendChild(button_confirm);
+            
+            // alert("One item or more is missing a rating.");
             cont= false;
             break;
         }
@@ -209,7 +221,7 @@ function howManyRounds(){
     question_ = "How many rounds were played in the game?";
     var choices_rounds = ["Two (2)","Four (4)", "Six (6)", "Eight (8)"];
 
-    document.getElementById("main_container").innerHTML = `<div class='row2' style="font-size:35px;">${question_}</div><div class='row3' id='table_dt'></div><div class='row4'><button id='confirm_howManyRounds' onclick='confirm_howManyRounds()'>Next</button></div>`;
+    document.getElementById("main_container").innerHTML = `<div class='row2' style="font-size:35px;">${question_}</div><div class='row3' id='table_dt'></div><div class='row4' id='row_confirm'><button id='confirm_howManyRounds' onclick='confirm_howManyRounds()'>Next</button></div>`;
     
     var rowIndex, colIndex;
     
@@ -244,7 +256,18 @@ function howManyRounds(){
 
 function confirm_howManyRounds(){
     if(rep_questionnaire["rounds"]==""){
-        alert("One item or more is missing a rating.");
+        var text_missing = document.createElement("div");
+        text_missing.innerHTML = "One item or more is missing a rating. You can fill them in, or ignore it by clicking on the button below once more. </br>";
+        text_missing.className = "rating_missing_questionnaire";
+
+        var button_confirm = document.createElement("button");
+        button_confirm.innerHTML = "Confirm";
+        button_confirm.setAttribute("onclick","pepperAlloc()");
+
+        document.getElementById("row_confirm").innerHTML="";
+        document.getElementById("row_confirm").appendChild(text_missing);
+        document.getElementById("row_confirm").appendChild(button_confirm);
+        // alert("One item or more is missing a rating.");
     }
     else{
         pepperAlloc();
@@ -256,7 +279,7 @@ function pepperAlloc(){
     question_ = "What were Pepper's allocation decisions in the last two rounds of the game?";
     var choices_pepperAlloc = shuffleArray(["team/team","team/individual", "individual/team", "individual/individual"]);
 
-    document.getElementById("main_container").innerHTML = `<div class='row2' style="font-size:35px;">${question_}</div><div class='row3' id='table_dt'></div><div class='row4'><button id='confirm_pepperAlloc' onclick='confirm_pepperAlloc()'>Next</button></div>`;
+    document.getElementById("main_container").innerHTML = `<div class='row2' style="font-size:35px;">${question_}</div><div class='row3' id='table_dt'></div><div class='row4'id='row_confirm'><button id='confirm_pepperAlloc' onclick='confirm_pepperAlloc()'>Next</button></div>`;
     
     var rowIndex, colIndex;
     
@@ -291,7 +314,18 @@ function pepperAlloc(){
 
 function confirm_pepperAlloc(){
     if(rep_questionnaire["pepAlloc"]==""){
-        alert("One item or more is missing a rating.");
+        var text_missing = document.createElement("div");
+        text_missing.innerHTML = "One item or more is missing a rating. You can fill them in, or ignore it by clicking on the button below once more. </br>";
+        text_missing.className = "rating_missing_questionnaire";
+
+        var button_confirm = document.createElement("button");
+        button_confirm.innerHTML = "Confirm";
+        button_confirm.setAttribute("onclick","rosas_mdmt(1,16)");
+
+        document.getElementById("row_confirm").innerHTML="";
+        document.getElementById("row_confirm").appendChild(text_missing);
+        document.getElementById("row_confirm").appendChild(button_confirm);
+        // alert("One item or more is missing a rating.");
     }
     else{
         rosas_mdmt(1,16);
@@ -304,7 +338,7 @@ function rosas_mdmt(page,itemsPerPage){ //there are 32 items in rosas_mdmtItems,
     // console.log("first item in rosas mdmt " + first_item);
 
     question_ = "How much do you find Pepper to be [word]?";
-    document.getElementById("main_container").innerHTML = `<div class='row2' style="font-size:35px;">${question_}${scale7_explained}</div><div class='row3' id='table_dt'></div><div class='row4'><button id='confirm_rosas_mdmt${page}' onclick='confirm_rosas_mdmt(${page},${itemsPerPage})'>Next</button></div>`;
+    document.getElementById("main_container").innerHTML = `<div class='row2' style="font-size:35px;">${question_}${scale7_explained}</div><div class='row3' id='table_dt'></div><div class='row4' id='row_confirm'><button id='confirm_rosas_mdmt${page}' onclick='confirm_rosas_mdmt(${page},${itemsPerPage})'>Next</button></div>`;
     
     var rowIndex, colIndex;
     
@@ -371,7 +405,23 @@ function confirm_rosas_mdmt(page,itemsPerPage){
     for (i = 0; i<itemsPerPage ; i++){
         var item = rosas_mdmtOrder[first_item+i];
         if(rep_questionnaire[item]==""){
-            alert("One item or more is missing a rating.");
+            var text_missing = document.createElement("div");
+            text_missing.innerHTML = "One item or more is missing a rating. You can fill them in, or ignore it by clicking on the button below once more. </br>";
+            text_missing.className = "rating_missing_questionnaire";
+
+            var button_confirm = document.createElement("button");
+            button_confirm.innerHTML = "Confirm";
+            if((page*itemsPerPage)<32){
+                button_confirm.setAttribute("onclick",`rosas_mdmt(${page+1},${itemsPerPage})`);
+            }
+            else{
+                button_confirm.setAttribute("onclick",`demographics_age()`);
+            }
+
+            document.getElementById("row_confirm").innerHTML="";
+            document.getElementById("row_confirm").appendChild(text_missing);
+            document.getElementById("row_confirm").appendChild(button_confirm);
+            // alert("One item or more is missing a rating.");
             cont= false;
             break;
         }
@@ -391,14 +441,25 @@ function confirm_rosas_mdmt(page,itemsPerPage){
 function demographics_age(){
     question_ = "How old are you?";
 
-    document.getElementById("main_container").innerHTML =`<div class='row2'><label for="age" style="font-size:35px;">${question_}</label></br><input type="text" id="age" name="age" size="10" style="font-size:35px; width:30% ; height:60px; padding: 20px 10px; text-align:center;"/></div><div class='row3'><button id='confirm_demographics_age' onclick='confirm_demographics_age()'>Next</button></div>`;
+    document.getElementById("main_container").innerHTML =`<div class='row2'><label for="age" style="font-size:35px;">${question_}</label></br><input type="text" id="age" name="age" size="10" style="font-size:35px; width:30% ; height:60px; padding: 20px 10px; text-align:center;"/></div><div class='row3' id='row_confirm'><button id='confirm_demographics_age' onclick='confirm_demographics_age()'>Next</button></div>`;
 }
 
 function confirm_demographics_age(){
     rep_questionnaire["age"]= document.getElementById("age").value;
 
     if(rep_questionnaire["age"]==""){
-        alert("One item or more is missing a rating.");
+        var text_missing = document.createElement("div");
+        text_missing.innerHTML = "One item or more is missing a rating. You can fill them in, or ignore it by clicking on the button below once more. </br>";
+        text_missing.className = "rating_missing_questionnaire";
+
+        var button_confirm = document.createElement("button");
+        button_confirm.innerHTML = "Confirm";
+        button_confirm.setAttribute("onclick","demographics_gender()");
+
+        document.getElementById("row_confirm").innerHTML="";
+        document.getElementById("row_confirm").appendChild(text_missing);
+        document.getElementById("row_confirm").appendChild(button_confirm);
+        // alert("One item or more is missing a rating.");
     }
     else{
         demographics_gender();
@@ -411,7 +472,7 @@ function demographics_gender(){
     question_ = "How do you identify?";
     var choices_demo_gender = shuffleArray(["Woman","Man","Nonbinary"]).concat(["Prefers not to say"]);
 
-    document.getElementById("main_container").innerHTML = `<div class='row2' style="font-size:35px;">${question_}</div><div class='row3' id='table_dt'></div><div class='row4'><button id='confirm_demo_gender' onclick='confirm_demo_gender()'>Next</button></div>`;
+    document.getElementById("main_container").innerHTML = `<div class='row2' style="font-size:35px;">${question_}</div><div class='row3' id='table_dt'></div><div class='row4' id='row_confirm'><button id='confirm_demo_gender' onclick='confirm_demo_gender()'>Next</button></div>`;
     
     var rowIndex, colIndex;
     
@@ -446,7 +507,18 @@ function demographics_gender(){
 
 function confirm_demo_gender(){
     if(rep_questionnaire["gender"]==""){
-        alert("One item or more is missing a rating.");
+        var text_missing = document.createElement("div");
+        text_missing.innerHTML = "One item or more is missing a rating. You can fill them in, or ignore it by clicking on the button below once more. </br>";
+        text_missing.className = "rating_missing_questionnaire";
+
+        var button_confirm = document.createElement("button");
+        button_confirm.innerHTML = "Confirm";
+        button_confirm.setAttribute("onclick","demographics_study()");
+
+        document.getElementById("row_confirm").innerHTML="";
+        document.getElementById("row_confirm").appendChild(text_missing);
+        document.getElementById("row_confirm").appendChild(button_confirm);
+        // alert("One item or more is missing a rating.");
     }
     else{
         demographics_study();
@@ -457,7 +529,7 @@ function demographics_study(){
     question_= "How much of your education and/or occupation is related to technology?";
     var ratings_demo_study = ["Not at all related", "A little bit related", "Moderately related", "Related", "Completely related"];
 
-    document.getElementById("main_container").innerHTML = `<div class='row2' style="font-size:35px;">${question_}</div><div class='row3' id='table_dt'></div><div class='row4'><button id='confirm_demo_study' onclick='confirm_demo_study()'>Next</button></div>`;
+    document.getElementById("main_container").innerHTML = `<div class='row2' style="font-size:35px;">${question_}</div><div class='row3' id='table_dt'></div><div class='row4' id='row_confirm'><button id='confirm_demo_study' onclick='confirm_demo_study()'>Next</button></div>`;
     
     var rowIndex, colIndex;
     
@@ -492,7 +564,18 @@ function demographics_study(){
 
 function confirm_demo_study(){
     if(rep_questionnaire["study"]==""){
-        alert("One item or more is missing a rating.");
+        var text_missing = document.createElement("div");
+        text_missing.innerHTML = "One item or more is missing a rating. You can fill them in, or ignore it by clicking on the button below once more. </br>";
+        text_missing.className = "rating_missing_questionnaire";
+
+        var button_confirm = document.createElement("button");
+        button_confirm.innerHTML = "Confirm";
+        button_confirm.setAttribute("onclick","demographics_exp()");
+
+        document.getElementById("row_confirm").innerHTML="";
+        document.getElementById("row_confirm").appendChild(text_missing);
+        document.getElementById("row_confirm").appendChild(button_confirm);
+        // alert("One item or more is missing a rating.");
     }
     else{
         demographics_exp();
@@ -503,7 +586,7 @@ function demographics_exp(){
     question_= "How much previous experience with robots do you have?";
     var ratings_demo_exp = ["Nothing at all", "I've seen some, but no interaction", "I've interacted with one under supervision (at an event, for example)", "I've worked with robots once", "I frequently interact or work with robots"];
 
-    document.getElementById("main_container").innerHTML = `<div class='row2' style="font-size:35px;">${question_}</div><div class='row3' id='table_dt'></div><div class='row4'><button id='confirm_demo_exp' onclick='confirm_demo_exp()'>Next</button></div>`;
+    document.getElementById("main_container").innerHTML = `<div class='row2' style="font-size:35px;">${question_}</div><div class='row3' id='table_dt'></div><div class='row4' id='row_confirm'><button id='confirm_demo_exp' onclick='confirm_demo_exp()'>Next</button></div>`;
     
     var rowIndex, colIndex;
     
@@ -540,7 +623,18 @@ function demographics_exp(){
 
 function confirm_demo_exp(){
     if(rep_questionnaire["exp"]==""){
-        alert("One item or more is missing a rating.");
+        var text_missing = document.createElement("div");
+        text_missing.innerHTML = "One item or more is missing a rating. You can fill them in, or ignore it by clicking on the button below once more. </br>";
+        text_missing.className = "rating_missing_questionnaire";
+
+        var button_confirm = document.createElement("button");
+        button_confirm.innerHTML = "Confirm";
+        button_confirm.setAttribute("onclick","openFeedback()");
+
+        document.getElementById("row_confirm").innerHTML="";
+        document.getElementById("row_confirm").appendChild(text_missing);
+        document.getElementById("row_confirm").appendChild(button_confirm);
+        // alert("One item or more is missing a rating.");
     }
     else{
         openFeedback();
