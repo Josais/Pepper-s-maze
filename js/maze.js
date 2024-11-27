@@ -14,18 +14,30 @@ const nbCoins = 15;
 
 var tutorialMode;
 
-const strats = ["denial", "compensation", "apology"]; //one of those is chosen just once
-try{
-    var stratType = strats[randomIndex(strats.length)];
-}catch(err){
-    document.getElementById("main_container").innerHTML = err.message;
-}
+// const strats = ["denial", "compensation", "apology"]; //one of those is chosen just once
+// try{
+//     var stratType = strats[randomIndex(strats.length)];
+// }catch(err){
+//     document.getElementById("main_container").innerHTML = err.message;
+// }
 
-var failures= failures = shuffleArray(["morality","performance"]);
-var failType;
+// var failures= failures = shuffleArray(["morality","performance"]);
+// var failType;
+// if(!multipleFailTypes){
+//     failType = failures[randomIndex(failures.length)];
+// }
+
+//if need precise conditions while still keeping a little bit of randomness
+const coupleStratFail = [["apology","performance"],["compensation","performance"]];
+var indexCouple = randomIndex(coupleStratFail.length);
+var stratType = coupleStratFail[indexCouple][0];
 if(!multipleFailTypes){
-    failType = failures[randomIndex(failures.length)];
+    var failType = coupleStratFail[indexCouple][1];
 }
+console.log(coupleStratFail);
+console.log(indexCouple);
+console.log(stratType);
+console.log(failType);
 
 //MANAGEMENT OF PEPPER'S MESSAGES AND BEHAVIOUR IN THE GAME ==========================================================================================================
 var pepperMsgs, pepperBehaviour;
