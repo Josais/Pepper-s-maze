@@ -5,6 +5,7 @@ const gamePerExperiment = 1; //works for 1 or 2 only
 
 const randomSpawn = false; //if true, the point from which participant start each round will be randomized; if false, it will be fixed to the middle of the maze
 const multipleFailTypes = false; // do participant go through both failure types or only one
+const specificConditions = true; // to keep specific combinations while maintaining as much randomness as possible
 const randomMazeGen = false; //if true, maze will be randomly generated ; however, the maze for the tutorial is always the same
 
 //if randomMazeGen, the following three constants can be changed; else, mazeWidth = 26; mazeHeight = 18; nbCoins = 15;
@@ -14,30 +15,31 @@ const nbCoins = 15;
 
 var tutorialMode;
 
-// const strats = ["denial", "compensation", "apology"]; //one of those is chosen just once
-// try{
-//     var stratType = strats[randomIndex(strats.length)];
-// }catch(err){
-//     document.getElementById("main_container").innerHTML = err.message;
-// }
+if(!specificConditions){
+    const strats = ["denial", "compensation", "apology"]; //one of those is chosen just once
+    try{
+        var stratType = strats[randomIndex(strats.length)];
+    }catch(err){
+        document.getElementById("main_container").innerHTML = err.message;
+    }
 
-// var failures= failures = shuffleArray(["morality","performance"]);
-// var failType;
-// if(!multipleFailTypes){
-//     failType = failures[randomIndex(failures.length)];
-// }
-
-//if need precise conditions while still keeping a little bit of randomness
-const coupleStratFail = [["apology","performance"],["compensation","performance"]];
-var indexCouple = randomIndex(coupleStratFail.length);
-var stratType = coupleStratFail[indexCouple][0];
-if(!multipleFailTypes){
-    var failType = coupleStratFail[indexCouple][1];
+    var failures= failures = shuffleArray(["morality","performance"]);
+    var failType;
+    if(!multipleFailTypes){
+        failType = failures[randomIndex(failures.length)];
+    }
+}else{ //if you want to keep specific combinations while maintaining as much randomness as possible
+    const coupleStratFail = [["apology","performance"],["compensation","performance"], ["denial","morality"]];
+    var indexCouple = randomIndex(coupleStratFail.length);
+    var stratType = coupleStratFail[indexCouple][0];
+    if(!multipleFailTypes){
+        var failType = coupleStratFail[indexCouple][1];
+    }
+    console.log(coupleStratFail);
+    console.log(indexCouple);
+    console.log(stratType);
+    console.log(failType);
 }
-console.log(coupleStratFail);
-console.log(indexCouple);
-console.log(stratType);
-console.log(failType);
 
 //MANAGEMENT OF PEPPER'S MESSAGES AND BEHAVIOUR IN THE GAME ==========================================================================================================
 var pepperMsgs, pepperBehaviour;
@@ -364,11 +366,11 @@ function startExperiment2(){
 function startGame(){
     
     if(currentRound==1){
-        if(multipleFailTypes){
+        if(multipleFailTypes && !specificConditions){
             failType = failures[currentGame-1];
         }
         setPepperMsgs(stratType,failType);
-        console.log("stratType= " +stratType + "; failtype= " + failType + "; failures= " + failures);
+        console.log("stratType= " +stratType + "; failtype= " + failType);
         pepperMsgInit();
     }else{
         init();
