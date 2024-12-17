@@ -5,7 +5,7 @@ const gamePerExperiment = 1; //works for 1 or 2 only
 
 const randomSpawn = false; //if true, the point from which participant start each round will be randomized; if false, it will be fixed to the middle of the maze
 const multipleFailTypes = false; // do participant go through both failure types or only one
-const specificConditions = true; // to keep specific combinations while maintaining as much randomness as possible
+const specificConditions = false; // to keep specific combinations while maintaining as much randomness as possible
 const randomMazeGen = false; //if true, maze will be randomly generated ; however, the maze for the tutorial is always the same
 
 //if randomMazeGen, the following three constants can be changed; else, mazeWidth = 26; mazeHeight = 18; nbCoins = 15;
